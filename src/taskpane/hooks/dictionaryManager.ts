@@ -8,6 +8,7 @@ interface DictionaryManager {
     dictionary: OptionalDictionary;
     dictionaryUpdating: boolean;
     checkSpellings(toCheck: string[]);
+    retryDictionaryDownload();
 }
 
 interface Dictionary {
@@ -58,6 +59,7 @@ export function useDictionaryManager(): DictionaryManager {
         dictionary,
         dictionaryUpdating: ongoingAPICall,
         checkSpellings,
+        retryDictionaryDownload: mutexFetchDictionary,
     };
 }
 
@@ -65,7 +67,8 @@ function fetchDictionary(languageName: string): Promise<Dictionary> {
     return axios.get(`${url}/languages/${languageName}/dictionaries/versions/latest`).then(result => result.data.data);
 }
 
-function checkWeHaveTheLatestVersion(dictionary: Dictionary) {
+function checkWeHaveTheLatestVersion(dictionary: OptionalDictionary) {
+    if (!dictionary) return Promise.resolve(false);
     return axios.get(`${url}/dictionaries/versions/${dictionary.id}/is_latest`).then(result => result.data.data.is_latest);
 }
 

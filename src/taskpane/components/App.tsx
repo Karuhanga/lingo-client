@@ -5,6 +5,7 @@ import WrongWordList from "./WrongWordList";
 import Progress from "./Progress";
 import {useState} from "react";
 import useInterval from "@use-it/interval";
+import {PrimaryButton} from "office-ui-fabric-react";
 
 // images references in the manifest
 import "../../../assets/icon-16.png";
@@ -20,7 +21,7 @@ export interface AppProps {
 }
 
 export default function App({ title, isOfficeInitialized }: AppProps) {
-  const [debug] = useState("");
+  const [debug, setDebug] = useState("");
 
   const [wrongWords, setWrongWords] = useState<WrongWord[]>([]);
   const [checking, setChecking] = useState(false);
@@ -35,9 +36,20 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
   }
 
   if (!dictionaryManager.weHaveADictionary()) {
-    return (
-        <Progress title="Setting up..." logo="assets/logo.png" message="Downloading your dictionary. This will be a one time thing. Promise 🙃" />
-    )
+    if (dictionaryManager.dictionaryUpdating) {
+      return (
+          <Progress title="Setting up..." logo="assets/logo.png" message="Downloading your dictionary. This will be a one time thing. Promise 🙃" />
+      )
+    } else {
+      return (
+          <div className="ms-welcome">
+            <Header logo="assets/logo.png" title={title} message="Spell Checker" />
+            <section className="ms-welcome__header ms-bgColor-neutralLighter ms-u-fadeIn500" style={{paddingTop: "15px", paddingBottom: "7.5px"}}>
+              <PrimaryButton onClick={dictionaryManager.retryDictionaryDownload}>Retry Dictionary Download</PrimaryButton>
+            </section>
+          </div>
+      )
+    }
   }
 
   function removeWrongWord(wrongWord: string) {
@@ -55,6 +67,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
   }
 
   useInterval(() => runSpellCheck(), 5000);
+  setDebug(JSON.stringify(dictionaryManager.dictionary));
 
   return (
       <div className="ms-welcome">
