@@ -9,6 +9,12 @@ Helpful links;
 - Access console logs: https://docs.microsoft.com/en-us/office/dev/add-ins/testing/debug-office-add-ins-on-ipad-and-mac
 - 
 
+Pending;
+- Calculate suggestions
+- Suggest words
+- Add words to local dictionary
+
+
 This repository contains the source code used by the [Yo Office generator](https://github.com/OfficeDev/generator-office) when you create a new Office Add-in that appears in the task pane. You can also use this repository as a sample to base your own project from if you choose not to use the generator. 
 
 ## TypeScript
