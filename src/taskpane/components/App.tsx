@@ -21,13 +21,26 @@ export interface AppProps {
 }
 
 export default function App({ title, isOfficeInitialized }: AppProps) {
-  const [debug, setDebug] = useState("");
-
   const [wrongWords, setWrongWords] = useState<WrongWord[]>([]);
   const [checking, setChecking] = useState(false);
   const dictionaryManager = useDictionaryManager();
   const documentManager = useDocumentManager();
 
+  function removeWrongWord(wrongWord: string) {
+    setWrongWords(wrongWords.filter(word => word.wrong !== wrongWord));
+  }
+
+  function runSpellCheck() {
+    if (dictionaryManager.weHaveADictionary() && !checking) {
+      setChecking(true);
+      documentManager.getWords()
+          .then(dictionaryManager.checkSpellings)
+          .then(newWrongWords => setWrongWords(uniqueWrongWords(newWrongWords)))
+          .finally(() => setChecking(false));
+    }
+  }
+
+  useInterval(() => runSpellCheck(), 5000);
 
   if (!isOfficeInitialized) {
     return (
@@ -52,26 +65,8 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
     }
   }
 
-  function removeWrongWord(wrongWord: string) {
-    setWrongWords(wrongWords.filter(word => word.wrong !== wrongWord));
-  }
-
-  function runSpellCheck() {
-    if (dictionaryManager.weHaveADictionary() && !checking) {
-      setChecking(true);
-      documentManager.getWords()
-          .then(dictionaryManager.checkSpellings)
-          .then(newWrongWords => setWrongWords(uniqueWrongWords(newWrongWords)))
-          .finally(() => setChecking(false));
-    }
-  }
-
-  useInterval(() => runSpellCheck(), 5000);
-  setDebug(JSON.stringify(dictionaryManager.dictionary));
-
   return (
       <div className="ms-welcome">
-        {debug}
         <Header logo="assets/logo.png" title={title} message="Spell Checker" />
         <WrongWordList
             message="Possible misspellings"

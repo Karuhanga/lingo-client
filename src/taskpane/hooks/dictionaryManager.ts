@@ -29,7 +29,7 @@ export function useDictionaryManager(): DictionaryManager {
         return Promise.resolve(
             toCheck
             .filter(word => !dictionary.words.includes(word))
-            .map(word => ({wrong: word, suggestions: ["omuntu", "omuganda"]}))
+            .map(word => ({wrong: word, suggestions: ["omuntu", "omulala"]}))
         );
     }
 
