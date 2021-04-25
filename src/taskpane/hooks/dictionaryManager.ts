@@ -1,11 +1,81 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import axios from "axios";
+import {url} from "../../config";
+import {WrongWord} from "../components/SingleWrongWord";
 
 interface DictionaryManager {
-    weHaveADictionary: boolean;
+    weHaveADictionary(): boolean;
+    dictionary: OptionalDictionary;
+    dictionaryUpdating: boolean;
+    checkSpellings(toCheck: string[]);
 }
 
-export function useDictionaryManager(): DictionaryManager {
-    const [weHaveADictionary] = useState(true);
+interface Dictionary {
+    id: number,
+    words: string[],
+    language: string,
+}
 
-    return {weHaveADictionary};
+type OptionalDictionary = Dictionary | null;
+
+const dictionaryStorageKey = 'lingoDictionary';
+
+export function useDictionaryManager(): DictionaryManager {
+    const [dictionary, setDictionary] = useState<OptionalDictionary>(loadDictionary());
+    const [ongoingAPICall, setOngoingAPICall] = useState<boolean>(false);
+
+    function checkSpellings(toCheck: string[]): Promise<WrongWord[]> {
+        return Promise.resolve(
+            toCheck
+            .filter(word => !dictionary.words.includes(word))
+            .map(word => ({wrong: word, suggestions: ["omuntu", "omuganda"]}))
+        );
+    }
+
+    function mutexFetchDictionary() {
+        if (ongoingAPICall) return;
+
+        setOngoingAPICall(true);
+        fetchDictionary('Luganda')
+        .then(dictionary => {
+            saveDictionary(dictionary);
+            setDictionary(dictionary);
+        })
+        .finally(() => setOngoingAPICall(false));
+    }
+
+    useEffect(() => {
+        setOngoingAPICall(true);
+        checkWeHaveTheLatestVersion(dictionary)
+            .then(weDo => {
+                if (!weDo) mutexFetchDictionary()
+            })
+            .finally(() => setOngoingAPICall(false));
+    }, []);
+
+    return {
+        weHaveADictionary: () => !!dictionary,
+        dictionary,
+        dictionaryUpdating: ongoingAPICall,
+        checkSpellings,
+    };
+}
+
+function fetchDictionary(languageName: string): Promise<Dictionary> {
+    return axios.get(`${url}/languages/${languageName}/dictionaries/versions/latest`).then(result => result.data.data);
+}
+
+function checkWeHaveTheLatestVersion(dictionary: Dictionary) {
+    return axios.get(`${url}/dictionaries/versions/${dictionary.id}/is_latest`).then(result => result.data.data.is_latest);
+}
+
+function loadDictionary(): OptionalDictionary {
+    const savedDictionary = localStorage.getItem(dictionaryStorageKey);
+
+    if (savedDictionary === null) return null;
+    else return JSON.parse(savedDictionary)
+}
+
+function saveDictionary(dictionary: Dictionary) {
+    localStorage.setItem(dictionaryStorageKey, JSON.stringify(dictionary))
 }

@@ -34,7 +34,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
     );
   }
 
-  if (!dictionaryManager.weHaveADictionary) {
+  if (!dictionaryManager.weHaveADictionary()) {
     return (
         <Progress title="Setting up..." logo="assets/logo.png" message="Downloading your dictionary. This will be a one time thing. Promise 🙃" />
     )
@@ -45,10 +45,10 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
   }
 
   function runSpellCheck() {
-    if (dictionaryManager.weHaveADictionary && !checking) {
+    if (dictionaryManager.weHaveADictionary() && !checking) {
       setChecking(true);
       documentManager.getWords()
-          .then(checkSpellings)
+          .then(dictionaryManager.checkSpellings)
           .then(newWrongWords => setWrongWords(uniqueWrongWords(newWrongWords)))
           .finally(() => setChecking(false));
     }
@@ -69,10 +69,6 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
         />
       </div>
   );
-}
-
-function checkSpellings(toCheck: string[]): Promise<WrongWord[]> {
-  return Promise.resolve(toCheck.map(word => ({wrong: word, suggestions: ["as", "fg"]})));
 }
 
 function uniqueWrongWords(arr: WrongWord[]) {
