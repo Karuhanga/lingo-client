@@ -48,7 +48,7 @@ export function useDictionaryManager(): DictionaryManager {
         setOngoingAPICall(true);
         checkWeHaveTheLatestVersion(dictionary)
             .then(weDo => {
-                if (!weDo) mutexFetchDictionary()
+                if (!weDo) mutexFetchDictionary();
             })
             .finally(() => setOngoingAPICall(false));
     }, []);
