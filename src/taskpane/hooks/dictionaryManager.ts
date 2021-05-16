@@ -3,7 +3,7 @@ import axios from "axios";
 import {url} from "../../config";
 import {WrongWord} from "../components/SingleWrongWord";
 
-interface DictionaryManager {
+export interface DictionaryManager {
     weHaveADictionary(): boolean;
     dictionary: OptionalDictionary;
     dictionaryUpdating: boolean;

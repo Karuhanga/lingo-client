@@ -6,6 +6,9 @@ import Progress from "./Progress";
 import {useState} from "react";
 import useInterval from "@use-it/interval";
 import {PrimaryButton} from "office-ui-fabric-react";
+import {createWorkerFactory, useWorker} from '@shopify/react-web-worker';
+
+const createWorker = createWorkerFactory(() => import('../workers/spellChecker'));
 
 // images references in the manifest
 import "../../../assets/icon-16.png";
@@ -24,23 +27,26 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
   const [wrongWords, setWrongWords] = useState<WrongWord[]>([]);
   const [checking, setChecking] = useState(false);
   const dictionaryManager = useDictionaryManager();
-  const documentManager = useDocumentManager();
+  const documentManager = useDocumentManager(console.log);
+  const spellChecker = useWorker(createWorker);
 
   function removeWrongWord(wrongWord: string) {
     setWrongWords(wrongWords.filter(word => word.wrong !== wrongWord));
   }
 
-  function runSpellCheck() {
+  function triggerSpellCheck() {
     if (dictionaryManager.weHaveADictionary() && !checking) {
       setChecking(true);
-      documentManager.getWords()
-          .then(dictionaryManager.checkSpellings)
-          .then(newWrongWords => setWrongWords(uniqueWrongWords(newWrongWords)))
-          .finally(() => setChecking(false));
+      spellChecker.run(
+          documentManager,
+          dictionaryManager,
+          setWrongWords,
+      )
+      .finally(() => setChecking(false));
     }
   }
 
-  useInterval(() => runSpellCheck(), 5000);
+  useInterval(() => triggerSpellCheck(), 5000);
 
   if (!isOfficeInitialized) {
     return (
@@ -72,17 +78,10 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
         <WrongWordList
             message="Possible misspellings"
             recheckDisabled={checking}
-            recheck={() => runSpellCheck()}
+            recheck={() => triggerSpellCheck()}
             items={wrongWords}
             removeWord={removeWrongWord}
         />
       </div>
   );
-}
-
-function uniqueWrongWords(arr: WrongWord[]) {
-  const u = {};
-  return arr.filter((v) => {
-    return u[v.wrong] = !u.hasOwnProperty(v.wrong);
-  });
 }

@@ -1,7 +1,6 @@
-import {fixAnsiUtf8Issue} from "../../utils";
 import InsertLocation = Word.InsertLocation;
 
-interface DocumentManager {
+export interface DocumentManager {
     getWords();
     replaceWord(word: string, replacement: string, removeWord: (wrongWord: string) => void);
     jumpToWord(word: string);
@@ -10,13 +9,14 @@ interface DocumentManager {
 export function useDocumentManager(setDebug?): DocumentManager {
     function getDocumentWords() {
         return Word.run(async context => {
-            const doc = context.document.body.getHtml();
+            const body = context.document.body.load('text');
+            body.load('text');
             await context.sync();
-            const docContent = fixAnsiUtf8Issue(doc.value);
 
-            const htmlContent = new DOMParser().parseFromString(docContent, "text/html").body.innerText;
-            if (setDebug) setDebug(docContent);
-            return unique(removeSpaces(htmlContent.toLowerCase().split(/\s+/)));
+            const text = body.text;
+            if (setDebug) setDebug(text);
+
+            return unique(removeSpaces(text.toLowerCase().split(/\s+/)));
         });
     }
 
