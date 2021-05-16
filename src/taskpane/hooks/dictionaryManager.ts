@@ -21,17 +21,17 @@ type OptionalDictionary = Dictionary | null;
 
 const dictionaryStorageKey = 'lingoDictionary';
 
+export function checkSpellings(toCheck: string[], dictionary: Dictionary): Promise<WrongWord[]> {
+    return Promise.resolve(
+        toCheck
+            .filter(word => !dictionary.words.includes(word))
+            .map(word => ({wrong: word, suggestions: ["omuntu", "omulala"]}))
+    );
+}
+
 export function useDictionaryManager(): DictionaryManager {
     const [dictionary, setDictionary] = useState<OptionalDictionary>(loadDictionary());
     const [ongoingAPICall, setOngoingAPICall] = useState<boolean>(false);
-
-    function checkSpellings(toCheck: string[]): Promise<WrongWord[]> {
-        return Promise.resolve(
-            toCheck
-            .filter(word => !dictionary.words.includes(word))
-            .map(word => ({wrong: word, suggestions: ["omuntu", "omulala"]}))
-        );
-    }
 
     function mutexFetchDictionary() {
         if (ongoingAPICall) return;
@@ -58,7 +58,7 @@ export function useDictionaryManager(): DictionaryManager {
         weHaveADictionary: () => !!dictionary,
         dictionary,
         dictionaryUpdating: ongoingAPICall,
-        checkSpellings,
+        checkSpellings: (wordsToCheck: string[]) => checkSpellings(wordsToCheck, dictionary),
         retryDictionaryDownload: mutexFetchDictionary,
     };
 }
@@ -72,7 +72,7 @@ function checkWeHaveTheLatestVersion(dictionary: OptionalDictionary) {
     return axios.get(`${url}/dictionaries/versions/${dictionary.id}/is_latest`).then(result => result.data.data.is_latest);
 }
 
-function loadDictionary(): OptionalDictionary {
+export function loadDictionary(): OptionalDictionary {
     const savedDictionary = localStorage.getItem(dictionaryStorageKey);
 
     if (savedDictionary === null) return null;

@@ -6,7 +6,7 @@ export interface DocumentManager {
     jumpToWord(word: string);
 }
 
-export function useDocumentManager(setDebug?): DocumentManager {
+export function getDocumentManager(setDebug?): DocumentManager {
     function getDocumentWords() {
         return Word.run(async context => {
             const body = context.document.body.load('text');

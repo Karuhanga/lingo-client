@@ -1,6 +1,6 @@
 import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react";
 import * as React from "react";
-import {useDocumentManager} from "../hooks/documentManager";
+import {getDocumentManager} from "../hooks/documentManager";
 
 export interface WrongWord {wrong: string, suggestions: string[]}
 
@@ -14,7 +14,7 @@ export interface SingleWrongWordProps {
 export function SingleWrongWord({wrongWord, index, removeWord, setDebug}: SingleWrongWordProps) {
     const firstSuggestion = wrongWord.suggestions[0];
     const weHaveSuggestions = !!firstSuggestion;
-    const documentManager = useDocumentManager(setDebug);
+    const documentManager = getDocumentManager(setDebug);
 
     return (
         <tr key={index}>

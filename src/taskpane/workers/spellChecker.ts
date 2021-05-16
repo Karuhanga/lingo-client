@@ -1,15 +1,15 @@
-import {DocumentManager} from "../hooks/documentManager";
-import {DictionaryManager} from "../hooks/dictionaryManager";
+import {getDocumentManager} from "../hooks/documentManager";
 import {WrongWord} from "../components/SingleWrongWord";
+import {checkSpellings, loadDictionary} from "../hooks/dictionaryManager";
 
-export function run(
-    documentManager: DocumentManager,
-    dictionaryManager: DictionaryManager,
-    setWrongWords: (words: WrongWord[]) => void ,
-) {
+export function run() {
+    const documentManager = getDocumentManager();
+
+    console.trace(["In worker: ", window.document === undefined]);
+
     return documentManager.getWords()
-        .then(dictionaryManager.checkSpellings)
-        .then(newWrongWords => setWrongWords(uniqueWrongWords(newWrongWords)))
+        .then(wordsToCheck => checkSpellings(wordsToCheck, loadDictionary()))
+        .then(uniqueWrongWords);
 }
 
 function uniqueWrongWords(arr: WrongWord[]) {

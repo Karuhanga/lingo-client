@@ -16,7 +16,6 @@ import "../../../assets/icon-32.png";
 import "../../../assets/icon-80.png";
 import {WrongWord} from "./SingleWrongWord";
 import {useDictionaryManager} from "../hooks/dictionaryManager";
-import {useDocumentManager} from "../hooks/documentManager";
 
 export interface AppProps {
   title: string;
@@ -27,7 +26,6 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
   const [wrongWords, setWrongWords] = useState<WrongWord[]>([]);
   const [checking, setChecking] = useState(false);
   const dictionaryManager = useDictionaryManager();
-  const documentManager = useDocumentManager(console.log);
   const spellChecker = useWorker(createWorker);
 
   function removeWrongWord(wrongWord: string) {
@@ -35,15 +33,15 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
   }
 
   function triggerSpellCheck() {
+    console.time();
+    console.trace(["In worker: ", window.document === undefined]);
     if (dictionaryManager.weHaveADictionary() && !checking) {
       setChecking(true);
-      spellChecker.run(
-          documentManager,
-          dictionaryManager,
-          setWrongWords,
-      )
+      spellChecker.run()
+      .then(setWrongWords)
       .finally(() => setChecking(false));
     }
+    console.timeEnd();
   }
 
   useInterval(() => triggerSpellCheck(), 5000);

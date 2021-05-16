@@ -34,8 +34,8 @@ module.exports = async (env, options)  => {
         {
           test: /\.tsx?$/,
           use: [
-              'react-hot-loader/webpack',
-              'ts-loader'
+            'react-hot-loader/webpack',
+            'ts-loader'
           ],
           exclude: /node_modules/
         },
@@ -47,16 +47,16 @@ module.exports = async (env, options)  => {
           test: /\.(png|jpg|jpeg|gif)$/,
           loader: "file-loader",
           options: {
-            name: '[path][name].[ext]',          
+            name: '[path][name].[ext]',
           }
         },
         {
           test: /\.mjs$/,
           include: /node_modules/,
           type: "javascript/auto"
-        }
+        },
       ]
-    },    
+    },
     plugins: [
       new CleanWebpackPlugin(),
       new CopyWebpackPlugin({
@@ -80,23 +80,23 @@ module.exports = async (env, options)  => {
       new ExtractTextPlugin('[name].[hash].css'),
       new HtmlWebpackPlugin({
         filename: "taskpane.html",
-          template: './src/taskpane/taskpane.html',
-          chunks: ['taskpane', 'vendor', 'polyfills']
+        template: './src/taskpane/taskpane.html',
+        chunks: ['taskpane', 'vendor', 'polyfills']
       }),
       new HtmlWebpackPlugin({
-          filename: "commands.html",
-          template: "./src/commands/commands.html",
-          chunks: ["commands"]
+        filename: "commands.html",
+        template: "./src/commands/commands.html",
+        chunks: ["commands"]
       }),
       new webpack.ProvidePlugin({
         Promise: ["es6-promise", "Promise"]
-      })
+      }),
     ],
     devServer: {
       hot: true,
       headers: {
         "Access-Control-Allow-Origin": "*"
-      },      
+      },
       https: (options.https !== undefined) ? options.https : await devCerts.getHttpsServerOptions(),
       port: process.env.npm_package_config_dev_server_port || 3000
     }
