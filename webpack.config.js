@@ -49,6 +49,11 @@ module.exports = async (env, options)  => {
           options: {
             name: '[path][name].[ext]',          
           }
+        },
+        {
+          test: /\.mjs$/,
+          include: /node_modules/,
+          type: "javascript/auto"
         }
       ]
     },    
