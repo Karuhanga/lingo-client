@@ -14,7 +14,8 @@ Pending;
 - Suggest words
 - Add words to local dictionary
 - Upload all words
-- Performancee fixes
+- Performancee fixes(investigate https://www.npmjs.com/package/react-indexed-db-hooks)
+- stored dictionary versioning
 
 
 This repository contains the source code used by the [Yo Office generator](https://github.com/OfficeDev/generator-office) when you create a new Office Add-in that appears in the task pane. You can also use this repository as a sample to base your own project from if you choose not to use the generator. 

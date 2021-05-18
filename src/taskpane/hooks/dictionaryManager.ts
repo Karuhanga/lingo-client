@@ -7,14 +7,18 @@ interface DictionaryManager {
     weHaveADictionary(): boolean;
     dictionary: OptionalDictionary;
     dictionaryUpdating: boolean;
-    checkSpellings(toCheck: string[]);
+    checkSpellings(toCheck: string[]): Promise<WrongWord[]>;
     retryDictionaryDownload();
 }
 
-interface Dictionary {
+interface APIDictionary {
     id: number,
     words: string[],
     language: string,
+}
+
+interface Dictionary extends APIDictionary{
+    indexedWords: { [word: string]: boolean },
 }
 
 type OptionalDictionary = Dictionary | null;
@@ -28,7 +32,7 @@ export function useDictionaryManager(): DictionaryManager {
     function checkSpellings(toCheck: string[]): Promise<WrongWord[]> {
         return Promise.resolve(
             toCheck
-            .filter(word => !dictionary.words.includes(word))
+            .filter(word => !dictionary.indexedWords[word])
             .map(word => ({wrong: word, suggestions: ["omuntu", "omulala"]}))
         );
     }
@@ -38,8 +42,8 @@ export function useDictionaryManager(): DictionaryManager {
 
         setOngoingAPICall(true);
         fetchDictionary('Luganda')
-        .then(dictionary => {
-            saveDictionary(dictionary);
+        .then((apiDictionary: APIDictionary) => {
+            const dictionary = saveDictionary(apiDictionary);
             setDictionary(dictionary);
         })
         .finally(() => setOngoingAPICall(false));
@@ -79,6 +83,8 @@ function loadDictionary(): OptionalDictionary {
     else return JSON.parse(savedDictionary)
 }
 
-function saveDictionary(dictionary: Dictionary) {
+function saveDictionary(apiDictionary: APIDictionary) {
+    const dictionary = {...apiDictionary, indexedWords: apiDictionary.words.reduce((previousValue, currentValue) => ({...previousValue, [currentValue]: true}), {})};
     localStorage.setItem(dictionaryStorageKey, JSON.stringify(dictionary))
+    return dictionary;
 }

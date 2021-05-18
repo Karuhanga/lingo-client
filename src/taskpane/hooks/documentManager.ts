@@ -2,7 +2,7 @@ import {fixAnsiUtf8Issue} from "../../utils";
 import InsertLocation = Word.InsertLocation;
 
 interface DocumentManager {
-    getWords();
+    getWords(): Promise<string[]>;
     replaceWord(word: string, replacement: string, removeWord: (wrongWord: string) => void);
     jumpToWord(word: string);
 }

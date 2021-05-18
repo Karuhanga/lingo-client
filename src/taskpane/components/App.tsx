@@ -14,6 +14,7 @@ import "../../../assets/icon-80.png";
 import {WrongWord} from "./SingleWrongWord";
 import {useDictionaryManager} from "../hooks/dictionaryManager";
 import {useDocumentManager} from "../hooks/documentManager";
+import {asyncChunk} from "../utils/asyncChunk";
 
 export interface AppProps {
   title: string;
@@ -30,13 +31,25 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
     setWrongWords(wrongWords.filter(word => word.wrong !== wrongWord));
   }
 
+  function asyncCheckSpellings(words: string[]): Promise<WrongWord[]> {
+    console.trace(words.length)
+    return asyncChunk<string, WrongWord>(
+        words,
+        (chunk, acc) => dictionaryManager.checkSpellings(chunk).then(wrongWords => [...acc, ...wrongWords]),
+        10,
+    );
+  }
+
   function runSpellCheck() {
     if (dictionaryManager.weHaveADictionary() && !checking) {
       setChecking(true);
-      documentManager.getWords()
-          .then(dictionaryManager.checkSpellings)
-          .then(newWrongWords => setWrongWords(uniqueWrongWords(newWrongWords)))
-          .finally(() => setChecking(false));
+
+      new Promise((resolve: (result: Promise<string[]>) => void) => {
+        requestAnimationFrame(() => resolve(documentManager.getWords()));
+      })
+      .then(asyncCheckSpellings)
+      .then(newWrongWords => setWrongWords(uniqueWrongWords(newWrongWords)))
+      .finally(() => setChecking(false));
     }
   }
 
