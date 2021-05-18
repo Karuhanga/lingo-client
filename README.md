@@ -14,7 +14,7 @@ Pending;
 - Suggest words
 - Add words to local dictionary
 - Upload all words
-- Performancee fixes(investigate https://www.npmjs.com/package/react-indexed-db-hooks)
+- Performancee fixes(investigate https://www.npmjs.com/package/react-indexed-db-hooks and https://github.com/onefinestay/react-lazy-render)
 - stored dictionary versioning
 
 
