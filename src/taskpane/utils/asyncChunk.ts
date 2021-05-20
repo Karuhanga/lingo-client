@@ -1,5 +1,6 @@
 /**
  * Execute a given function on a sliceable object
+ * Credits: https://gist.github.com/anonymous/9279e2588ad9359085b8c66da5e94c41#file-chunk-js
  >> asyncChunk([], ((chunk, acc) => acc.concat(chunk)), [], 100);
  * */
 export function asyncChunk<Input, Output>(
