@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Button, ButtonType} from "office-ui-fabric-react";
+import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react";
 import {SingleWrongWord, WrongWord} from "./SingleWrongWord";
 
 export interface WrongWordListProps {
@@ -8,12 +8,13 @@ export interface WrongWordListProps {
   recheck(): void;
   recheckDisabled: boolean;
   removeWord(wrongWord: string): void;
+  loadMore();
   setDebug?(message: string): void;
 }
 
 export default class WrongWordList extends React.Component<WrongWordListProps> {
   render() {
-    const { items, message, recheck, recheckDisabled, removeWord, setDebug } = this.props;
+    const { items, message, recheck, recheckDisabled, removeWord, loadMore, setDebug } = this.props;
 
     return (
       <main className="ms-welcome__main">
@@ -34,6 +35,12 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
               <SingleWrongWord wrongWord={wrongWord} index={index} removeWord={removeWord} setDebug={setDebug} />
           )}
         </table>
+        {items.length < 1 ? null : (
+            <DefaultButton
+                text="Load more"
+                onClick={() => loadMore()}
+            />
+        )}
       </main>
     );
   }

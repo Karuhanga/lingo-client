@@ -14,14 +14,15 @@ import "../../../assets/icon-80.png";
 import {WrongWord} from "./SingleWrongWord";
 import {useDictionaryManager} from "../hooks/dictionaryManager";
 import {useDocumentManager} from "../hooks/documentManager";
-import {asyncChunk} from "../utils/asyncChunk";
 
 export interface AppProps {
   title: string;
   isOfficeInitialized: boolean;
 }
+const initialListCount = 30;
 
 export default function App({ title, isOfficeInitialized }: AppProps) {
+  const [count, setCount] = useState(initialListCount);
   const [wrongWords, setWrongWords] = useState<WrongWord[]>([]);
   const [checking, setChecking] = useState(false);
   const dictionaryManager = useDictionaryManager();
@@ -31,15 +32,6 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
     setWrongWords(wrongWords.filter(word => word.wrong !== wrongWord));
   }
 
-  function asyncCheckSpellings(words: string[]): Promise<WrongWord[]> {
-    console.trace(words.length)
-    return asyncChunk<string, WrongWord>(
-        words,
-        (chunk, acc) => dictionaryManager.checkSpellings(chunk).then(wrongWords => [...acc, ...wrongWords]),
-        10,
-    );
-  }
-
   function runSpellCheck() {
     if (dictionaryManager.weHaveADictionary() && !checking) {
       setChecking(true);
@@ -47,8 +39,12 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
       new Promise((resolve: (result: Promise<string[]>) => void) => {
         requestAnimationFrame(() => resolve(documentManager.getWords()));
       })
-      .then(asyncCheckSpellings)
-      .then(newWrongWords => setWrongWords(uniqueWrongWords(newWrongWords)))
+      // asyncCheckSpellings if we hit a performance bottleneck. todo: test on 10000 words
+      .then(dictionaryManager.checkSpellings)
+      .then(newWrongWords => {
+        setCount(initialListCount);
+        setWrongWords(uniqueWrongWords(newWrongWords));
+      })
       .finally(() => setChecking(false));
     }
   }
@@ -86,8 +82,9 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
             message="Possible misspellings"
             recheckDisabled={checking}
             recheck={() => runSpellCheck()}
-            items={wrongWords}
+            items={wrongWords.slice(0, count)}
             removeWord={removeWrongWord}
+            loadMore={() => setCount(count + 20)}
         />
       </div>
   );
