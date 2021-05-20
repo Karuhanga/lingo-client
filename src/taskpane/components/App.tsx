@@ -19,7 +19,7 @@ export interface AppProps {
   title: string;
   isOfficeInitialized: boolean;
 }
-const initialListCount = 10;
+const initialListCount = 20;
 
 export default function App({ title, isOfficeInitialized }: AppProps) {
   const [count, setCount] = useState(initialListCount);
