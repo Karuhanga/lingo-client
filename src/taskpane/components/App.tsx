@@ -3,7 +3,7 @@ import * as React from "react";
 import Header from "./Header";
 import WrongWordList from "./WrongWordList";
 import Progress from "./Progress";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import useInterval from "@use-it/interval";
 import {PrimaryButton} from "office-ui-fabric-react";
 
@@ -19,17 +19,18 @@ export interface AppProps {
   title: string;
   isOfficeInitialized: boolean;
 }
-const initialListCount = 30;
+const initialListCount = 10;
 
 export default function App({ title, isOfficeInitialized }: AppProps) {
   const [count, setCount] = useState(initialListCount);
-  const [wrongWords, setWrongWords] = useState<WrongWord[]>([]);
+  const [wrongWords, setWrongWords] = useState<string[]>([]);
+  const [wrongWordsWithSuggestions, setWrongWordsWithSuggestions] = useState<WrongWord[]>([]);
   const [checking, setChecking] = useState(false);
   const dictionaryManager = useDictionaryManager();
   const documentManager = useDocumentManager();
 
-  function removeWrongWord(wrongWord: string) {
-    setWrongWords(wrongWords.filter(word => word.wrong !== wrongWord));
+  async function removeWrongWord(wrongWord: string) {
+    await setWrongWords(wrongWords.filter(word => word !== wrongWord));
   }
 
   function runSpellCheck() {
@@ -43,11 +44,15 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
       .then(dictionaryManager.checkSpellings)
       .then(newWrongWords => {
         setCount(initialListCount);
-        setWrongWords(uniqueWrongWords(newWrongWords));
+        setWrongWords(newWrongWords);
       })
       .finally(() => setChecking(false));
     }
   }
+
+  useEffect(() => {
+    setWrongWordsWithSuggestions(wrongWords.slice(0, count).map(dictionaryManager.suggestCorrections))
+  }, [count, wrongWords]);
 
   useInterval(() => runSpellCheck(), 5000);
 
@@ -82,7 +87,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
             message="Possible misspellings"
             recheckDisabled={checking}
             recheck={() => runSpellCheck()}
-            items={wrongWords.slice(0, count)}
+            items={wrongWordsWithSuggestions}
             removeWord={removeWrongWord}
             loadMore={() => setCount(count + 20)}
         />
@@ -90,9 +95,9 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
   );
 }
 
-function uniqueWrongWords(arr: WrongWord[]) {
-  const u = {};
-  return arr.filter((v) => {
-    return u[v.wrong] = !u.hasOwnProperty(v.wrong);
-  });
-}
+// function uniqueWrongWords(arr: WrongWord[]) {
+//   const u = {};
+//   return arr.filter((v) => {
+//     return u[v.wrong] = !u.hasOwnProperty(v.wrong);
+//   });
+// }

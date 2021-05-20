@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
+import Fuse from 'fuse.js'
 import {url} from "../../config";
 import {WrongWord} from "../components/SingleWrongWord";
 
@@ -7,8 +8,9 @@ export interface DictionaryManager {
     weHaveADictionary(): boolean;
     dictionary: OptionalDictionary;
     dictionaryUpdating: boolean;
-    checkSpellings(toCheck: string[]): Promise<WrongWord[]>;
+    checkSpellings(toCheck: string[]): Promise<string[]>;
     retryDictionaryDownload();
+    suggestCorrections(word: string, correctionCount: 5): WrongWord;
 }
 
 interface APIDictionary {
@@ -19,6 +21,7 @@ interface APIDictionary {
 
 interface Dictionary extends APIDictionary{
     indexedWords: { [word: string]: boolean },
+    spellChecker: Fuse<string>,
 }
 
 type OptionalDictionary = Dictionary | null;
@@ -29,12 +32,20 @@ export function useDictionaryManager(): DictionaryManager {
     const [dictionary, setDictionary] = useState<OptionalDictionary>(loadDictionary());
     const [ongoingAPICall, setOngoingAPICall] = useState<boolean>(false);
 
-    function checkSpellings(toCheck: string[]): Promise<WrongWord[]> {
+    function checkSpellings(toCheck: string[]): Promise<string[]> {
         return Promise.resolve(
             toCheck
             .filter(word => !dictionary.indexedWords[word])
-            .map(word => ({wrong: word, suggestions: ["omuntu", "omulala"]}))
         );
+    }
+
+    function suggestCorrections(word: string): WrongWord {
+        const result = dictionary.spellChecker.search(word, {limit: 5});
+        return {
+            wrong: word,
+            // todo: do we want to use the weight here somehow?
+            suggestions: result.map(result => result.item),
+        };
     }
 
     function mutexFetchDictionary() {
@@ -64,6 +75,7 @@ export function useDictionaryManager(): DictionaryManager {
         dictionaryUpdating: ongoingAPICall,
         checkSpellings,
         retryDictionaryDownload: mutexFetchDictionary,
+        suggestCorrections,
     };
 }
 
@@ -80,11 +92,25 @@ function loadDictionary(): OptionalDictionary {
     const savedDictionary = localStorage.getItem(dictionaryStorageKey);
 
     if (savedDictionary === null) return null;
-    else return JSON.parse(savedDictionary)
+    else {
+        const dictionary: APIDictionary = JSON.parse(savedDictionary);
+        const options = {
+            // https://fusejs.io/api/options.html
+            includeScore: true,
+            minMatchCharLength: 3,
+            threshold: .3,
+            distance: 10,
+        };
+
+        return {
+            ...dictionary,
+            indexedWords: dictionary.words.reduce((previousValue, currentValue) => ({...previousValue, [currentValue]: true}), {}),
+            spellChecker: new Fuse(dictionary.words, options)
+        }
+    }
 }
 
 function saveDictionary(apiDictionary: APIDictionary) {
-    const dictionary = {...apiDictionary, indexedWords: apiDictionary.words.reduce((previousValue, currentValue) => ({...previousValue, [currentValue]: true}), {})};
-    localStorage.setItem(dictionaryStorageKey, JSON.stringify(dictionary))
-    return dictionary;
+    localStorage.setItem(dictionaryStorageKey, JSON.stringify(apiDictionary))
+    return loadDictionary();
 }
