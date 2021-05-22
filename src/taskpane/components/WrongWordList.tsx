@@ -37,7 +37,7 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
         </table>
         {items.length < 1 ? null : (
             <DefaultButton
-                text="Load more"
+                text="Show more"
                 onClick={() => loadMore()}
             />
         )}
