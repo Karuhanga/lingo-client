@@ -49,9 +49,11 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
             </Button>
         </h2>
         <table className="ms-font-m ms-fontColor-neutralPrimary">
-          {items.map((wrongWord, index) =>
-              <SingleWrongWord wrongWord={wrongWord} index={index} removeWord={removeWord} dictionaryManager={dictionaryManager} setDebug={setDebug} />
-          )}
+          <tbody>
+              {items.map((wrongWord, index) =>
+                  <SingleWrongWord key={index} wrongWord={wrongWord} index={index} removeWord={removeWord} dictionaryManager={dictionaryManager} setDebug={setDebug} />
+              )}
+          </tbody>
         </table>
         {items.length < 1 ? null : (
             <DefaultButton

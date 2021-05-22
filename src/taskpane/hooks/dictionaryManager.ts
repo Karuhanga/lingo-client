@@ -22,6 +22,12 @@ interface GlobalSuggestion {
     synced: boolean;
 }
 
+interface APIWord {
+    id: number,
+    word: string,
+    language: string,
+}
+
 interface APIDictionary {
     id: number,
     words: string[],
@@ -89,6 +95,7 @@ export function useDictionaryManager(): DictionaryManager {
     }
 
     function noteDownSyncedSuggestions(words: string[]) {
+        console.log(words)
         const persistedDictionary: PersistedDictionary = {
             id: dictionary.id,
             words: dictionary.words,
@@ -116,7 +123,7 @@ export function useDictionaryManager(): DictionaryManager {
         if (ongoingAPICall) return;
 
         setOngoingAPICall(true);
-        fetchDictionary(language)
+        api.fetchDictionary(language)
         .then((apiDictionary: APIDictionary) => {
             const persistedDictionary: PersistedDictionary = (
                 dictionary ?
@@ -130,7 +137,7 @@ export function useDictionaryManager(): DictionaryManager {
 
     useEffect(() => {
         setOngoingAPICall(true);
-        checkWeHaveTheLatestVersion(dictionary)
+        api.checkWeHaveTheLatestVersion(dictionary)
             .then(weDo => {
                 if (!weDo) mutexFetchDictionary();
             })
@@ -139,8 +146,8 @@ export function useDictionaryManager(): DictionaryManager {
 
     useEffect(() => {
         if (!dictionary) return;
-        suggestWords(language, dictionary.globalSuggestions.filter(suggestion => !suggestion.synced).map(suggestion => suggestion.word))
-            .then(noteDownSyncedSuggestions);
+        api.suggestWords(language, dictionary.globalSuggestions.filter(suggestion => !suggestion.synced).map(suggestion => suggestion.word))
+            .then((words: APIWord[]) => noteDownSyncedSuggestions(words.map(word => word.word)));
     }, []);
 
     return {
@@ -156,18 +163,18 @@ export function useDictionaryManager(): DictionaryManager {
     };
 }
 
-function fetchDictionary(languageName: string): Promise<APIDictionary> {
-    return axios.get(`${url}/languages/${languageName}/dictionaries/versions/latest`).then(result => result.data.data);
-}
-
-function suggestWords(languageName: string, words: string[]): Promise<string[]> {
-    return axios.post(`languages/${languageName}/suggestions`, {words}).then(result => result.data.data);
-}
-
-function checkWeHaveTheLatestVersion(dictionary: OptionalDictionary) {
-    if (!dictionary) return Promise.resolve(false);
-    return axios.get(`${url}/dictionaries/versions/${dictionary.id}/is_latest`).then(result => result.data.data.is_latest);
-}
+const api = {
+    fetchDictionary(languageName: string): Promise<APIDictionary> {
+        return axios.get(`${url}/languages/${languageName}/dictionaries/versions/latest`).then(result => result.data.data).catch(console.error);
+    },
+    suggestWords(languageName: string, words: string[]): Promise<APIWord[]> {
+        return axios.post(`${url}/languages/${languageName}/suggestions`, {words}).then(result => result.data.data).catch(console.error);
+    },
+    checkWeHaveTheLatestVersion(dictionary: OptionalDictionary) {
+        if (!dictionary) return Promise.resolve(false);
+        return axios.get(`${url}/dictionaries/versions/${dictionary.id}/is_latest`).then(result => result.data.data.is_latest).catch(console.error);
+    },
+};
 
 function loadDictionary(): OptionalDictionary {
     const savedDictionary = localStorage.getItem(dictionaryStorageKey);
