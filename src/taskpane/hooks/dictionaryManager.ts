@@ -1,8 +1,9 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
-import Fuse from 'fuse.js'
+import FuzzySet from 'fuzzyset'
 import {url} from "../../config";
 import {WrongWord} from "../components/SingleWrongWord";
+import {unique} from "../utils/utils";
 
 export interface DictionaryManager {
     weHaveADictionary(): boolean;
@@ -11,6 +12,14 @@ export interface DictionaryManager {
     checkSpellings(toCheck: string[]): Promise<string[]>;
     retryDictionaryDownload();
     suggestCorrections(word: string, correctionCount: 5): WrongWord;
+    addWordLocal(word: string);
+    addWordGlobal(word: string);
+    clearLocalDictionary();
+}
+
+interface GlobalSuggestion {
+    word: string;
+    synced: boolean;
 }
 
 interface APIDictionary {
@@ -19,14 +28,22 @@ interface APIDictionary {
     language: string,
 }
 
-interface Dictionary extends APIDictionary{
+interface PersistedDictionary extends APIDictionary {
+    localWords: string[],
+    globalSuggestions: GlobalSuggestion[],
+}
+
+interface Dictionary extends PersistedDictionary{
     indexedWords: { [word: string]: boolean },
-    spellChecker: Fuse<string>,
+    spellChecker: FuzzySet,
 }
 
 type OptionalDictionary = Dictionary | null;
 
 const dictionaryStorageKey = 'lingoDictionary';
+const language = 'Luganda';
+
+const minSimilarityScore = .7;
 
 export function useDictionaryManager(): DictionaryManager {
     const [dictionary, setDictionary] = useState<OptionalDictionary>(loadDictionary());
@@ -40,22 +57,61 @@ export function useDictionaryManager(): DictionaryManager {
     }
 
     function suggestCorrections(word: string): WrongWord {
-        const result = dictionary.spellChecker.search(word, {limit: 5});
+        const result: [number, string] = dictionary.spellChecker.get(word, [], minSimilarityScore);
         return {
             wrong: word,
-            // todo: do we want to use the weight here somehow?
-            suggestions: result.map(result => result.item),
+            suggestions: result.map(result => result[1]),
         };
+    }
+
+    function addWordLocal(word: string) {
+        const persistedDictionary: PersistedDictionary = {
+            id: dictionary.id,
+            words: dictionary.words,
+            language: dictionary.language,
+            localWords: unique([...dictionary.localWords, word]),
+            globalSuggestions: dictionary.globalSuggestions,
+        };
+
+        setDictionary(saveDictionary(persistedDictionary));
+    }
+
+    function addWordGlobal(word: string) {
+        const persistedDictionary: PersistedDictionary = {
+            id: dictionary.id,
+            words: dictionary.words,
+            language: dictionary.language,
+            localWords: dictionary.localWords,
+            globalSuggestions: [...dictionary.globalSuggestions, {word, synced: false}],
+        };
+
+        setDictionary(saveDictionary(persistedDictionary));
+    }
+
+    function clearLocalDictionary() {
+        const persistedDictionary: PersistedDictionary = {
+            id: dictionary.id,
+            words: dictionary.words,
+            language: dictionary.language,
+            localWords: [],
+            globalSuggestions: dictionary.globalSuggestions,
+        };
+
+        setDictionary(saveDictionary(persistedDictionary));
     }
 
     function mutexFetchDictionary() {
         if (ongoingAPICall) return;
 
         setOngoingAPICall(true);
-        fetchDictionary('Luganda')
+        fetchDictionary(language)
         .then((apiDictionary: APIDictionary) => {
-            const dictionary = saveDictionary(apiDictionary);
-            setDictionary(dictionary);
+            const persistedDictionary: PersistedDictionary = (
+                dictionary ?
+                    {...dictionary, ...apiDictionary} :
+                    {localWords: [], globalSuggestions: [], ...apiDictionary}
+            );
+            setDictionary(saveDictionary(persistedDictionary));
         })
         .finally(() => setOngoingAPICall(false));
     }
@@ -76,6 +132,9 @@ export function useDictionaryManager(): DictionaryManager {
         checkSpellings,
         retryDictionaryDownload: mutexFetchDictionary,
         suggestCorrections,
+        addWordLocal,
+        addWordGlobal,
+        clearLocalDictionary,
     };
 }
 
@@ -93,24 +152,18 @@ function loadDictionary(): OptionalDictionary {
 
     if (savedDictionary === null) return null;
     else {
-        const dictionary: APIDictionary = JSON.parse(savedDictionary);
-        const options = {
-            // https://fusejs.io/api/options.html
-            includeScore: true,
-            minMatchCharLength: 3,
-            threshold: .3,
-            distance: 10,
-        };
+        const dictionary: PersistedDictionary = JSON.parse(savedDictionary);
+        const words = unique([...dictionary.words, ...dictionary.localWords, ...dictionary.globalSuggestions.map(globalSuggestion => globalSuggestion.word)]);
 
         return {
             ...dictionary,
-            indexedWords: dictionary.words.reduce((previousValue, currentValue) => ({...previousValue, [currentValue]: true}), {}),
-            spellChecker: new Fuse(dictionary.words, options)
+            indexedWords: words.reduce((previousValue, currentValue) => ({...previousValue, [currentValue]: true}), {}),
+            spellChecker: new FuzzySet(words),
         }
     }
 }
 
-function saveDictionary(apiDictionary: APIDictionary) {
+function saveDictionary(apiDictionary: PersistedDictionary): Dictionary {
     localStorage.setItem(dictionaryStorageKey, JSON.stringify(apiDictionary))
     return loadDictionary();
 }

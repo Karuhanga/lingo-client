@@ -1,27 +1,30 @@
-import {fixAnsiUtf8Issue} from "../../utils";
 import InsertLocation = Word.InsertLocation;
+import {removeSpaces, unique} from "../utils/utils";
 
 interface DocumentManager {
     getWords(): Promise<string[]>;
-    replaceWord(word: string, replacement: string, removeWord: (wrongWord: string) => void);
+    replaceWord(word: string, replacement: string): Promise<void>;
     jumpToWord(word: string);
 }
 
 export function useDocumentManager(setDebug?): DocumentManager {
+    function cleanText(text) {
+        for (const character of [',', '.', '!', '?']) text = text.replace(character, '');
+        return unique(removeSpaces(text.toLowerCase().split(/\s+/)));
+    }
+
     function getDocumentWords() {
         return Word.run(async context => {
-            const doc = context.document.body.getHtml();
+            const body = context.document.body.load('text');
+            body.load('text');
             await context.sync();
-            const docContent = fixAnsiUtf8Issue(doc.value);
 
-            const htmlContent = new DOMParser().parseFromString(docContent, "text/html").body.innerText;
-            if (setDebug) setDebug(docContent);
-            return unique(removeSpaces(htmlContent.toLowerCase().split(/\s+/)));
+            return cleanText(body.text);
         });
     }
 
-    function replaceWord(word: string, replacement: string, removeWord: (wrongWord: string) => void) {
-        Word.run(async function (context) {
+    function replaceWord(word: string, replacement: string) {
+        return Word.run(async function (context) {
             const searchResults = context.document.body.search(word, {ignorePunct: true, matchWholeWord: true});
             context.load(searchResults);
             await context.sync();
@@ -35,7 +38,6 @@ export function useDocumentManager(setDebug?): DocumentManager {
             // Synchronize the document state by executing the queued commands,
             // and return a promise to indicate task completion.
             await context.sync();
-            removeWord(word);
         })
     }
 
@@ -48,15 +50,4 @@ export function useDocumentManager(setDebug?): DocumentManager {
         replaceWord,
         jumpToWord,
     }
-}
-
-function unique(arr: string[]) {
-    const u = {};
-    return arr.filter((v) => {
-        return u[v] = !u.hasOwnProperty(v);
-    });
-}
-
-function removeSpaces(words: string[]) {
-    return words.map(word => word.trim()).filter(word => !!word);
 }

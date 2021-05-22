@@ -1,6 +1,7 @@
 import * as React from "react";
 import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react";
 import {SingleWrongWord, WrongWord} from "./SingleWrongWord";
+import {DictionaryManager} from "../hooks/dictionaryManager";
 
 export interface WrongWordListProps {
   message: string;
@@ -9,12 +10,13 @@ export interface WrongWordListProps {
   recheckDisabled: boolean;
   removeWord(wrongWord: string): void;
   loadMore();
+  dictionaryManager: DictionaryManager;
   setDebug?(message: string): void;
 }
 
 export default class WrongWordList extends React.Component<WrongWordListProps> {
   render() {
-    const { items, message, recheck, recheckDisabled, removeWord, loadMore, setDebug } = this.props;
+    const { items, message, recheck, recheckDisabled, removeWord, loadMore, dictionaryManager, setDebug } = this.props;
 
     return (
       <main className="ms-welcome__main">
@@ -23,16 +25,32 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
             &nbsp;
             <Button
                 buttonType={ButtonType.icon}
-                iconProps={{ iconName: !recheckDisabled ? "Refresh" : "HourGlass" }}
+                iconProps={{ iconName: "Refresh" }}
                 onClick={recheck}
                 disabled={recheckDisabled}
+                style={{backgroundColor: "transparent"}}
             >
                 Recheck
+            </Button>
+            <Button
+                split
+                buttonType={ButtonType.icon}
+                menuProps={{
+                    items: [
+                        {
+                            key: 'clearLocalDictionary',
+                            text: 'Clear My Dictionary',
+                            onClick: () => dictionaryManager.clearLocalDictionary(),
+                        },
+                    ],
+                }}
+            >
+                Menu
             </Button>
         </h2>
         <table className="ms-font-m ms-fontColor-neutralPrimary">
           {items.map((wrongWord, index) =>
-              <SingleWrongWord wrongWord={wrongWord} index={index} removeWord={removeWord} setDebug={setDebug} />
+              <SingleWrongWord wrongWord={wrongWord} index={index} removeWord={removeWord} dictionaryManager={dictionaryManager} setDebug={setDebug} />
           )}
         </table>
         {items.length < 1 ? null : (

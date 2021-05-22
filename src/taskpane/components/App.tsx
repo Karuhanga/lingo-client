@@ -90,6 +90,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
             items={wrongWordsWithSuggestions}
             removeWord={removeWrongWord}
             loadMore={() => setCount(count + 20)}
+            dictionaryManager={dictionaryManager}
         />
       </div>
   );
