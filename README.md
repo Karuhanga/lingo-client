@@ -1,5 +1,8 @@
 ## Lingo Client
 
+### Prod;
+- [Client Service](https://karuhanga.github.io/lingo-client/taskpane.html)
+
 ### To run;
 - (If on mac) run `npm run dev-server`
 - Run `npm start`
