@@ -9,11 +9,7 @@
 - 
 
 ### Pending;
-- Upload all words
-- stored dictionary versioning
-- improve word suggestions
 - move words to infinite scroll
-- Explore better suggestion engine?.. examples: https://glench.github.io/fuzzyset.js/
 
 ### Nice to have;
 - Use indexed db fixes(investigate https://www.npmjs.com/package/react-indexed-db-hooks)

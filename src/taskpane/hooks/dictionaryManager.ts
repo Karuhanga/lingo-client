@@ -46,7 +46,7 @@ interface Dictionary extends PersistedDictionary{
 
 type OptionalDictionary = Dictionary | null;
 
-const dictionaryStorageKey = 'lingoDictionary';
+const dictionaryStorageKey = 'lingoDictionary_v2';
 const language = 'Luganda';
 
 const minSimilarityScore = .7;

@@ -28,6 +28,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
   const [checking, setChecking] = useState(false);
   const dictionaryManager = useDictionaryManager();
   const documentManager = useDocumentManager();
+  const [autoRefreshOn, setAutoRefresh] = useState(true);
 
   async function removeWrongWord(wrongWord: string) {
     await setWrongWords(wrongWords.filter(word => word !== wrongWord));
@@ -43,7 +44,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
       // asyncCheckSpellings if we hit a performance bottleneck. todo: test on 10000 words
       .then(dictionaryManager.checkSpellings)
       .then(newWrongWords => {
-        setCount(initialListCount);
+        if (autoRefreshOn) setCount(initialListCount);
         setWrongWords(newWrongWords);
       })
       .finally(() => setChecking(false));
@@ -54,7 +55,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
     setWrongWordsWithSuggestions(wrongWords.slice(0, count).map(dictionaryManager.suggestCorrections))
   }, [count, wrongWords]);
 
-  useInterval(() => runSpellCheck(), 5000);
+  useInterval(() => autoRefreshOn && runSpellCheck(), 15000);
 
   if (!isOfficeInitialized) {
     return (
@@ -86,10 +87,16 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
         <WrongWordList
             message="Possible misspellings"
             recheckDisabled={checking}
-            recheck={() => runSpellCheck()}
+            recheck={() => {
+              setAutoRefresh(true);
+              runSpellCheck();
+            }}
             items={wrongWordsWithSuggestions}
             removeWord={removeWrongWord}
-            loadMore={() => setCount(count + 20)}
+            loadMore={() => {
+              setAutoRefresh(false);
+              setCount(count + 20);
+            }}
             dictionaryManager={dictionaryManager}
         />
       </div>
