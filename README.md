@@ -10,6 +10,7 @@
 
 ### Pending;
 - move words to infinite scroll
+- improve auto refresh, performance compromise- right now, we have to choose one- auto refresh/ view more words
 
 ### Nice to have;
 - Use indexed db fixes(investigate https://www.npmjs.com/package/react-indexed-db-hooks)
