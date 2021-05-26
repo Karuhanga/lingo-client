@@ -97,6 +97,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
               setAutoRefresh(false);
               setCount(count + 20);
             }}
+            showShowMore={count < wrongWords.length}
             dictionaryManager={dictionaryManager}
         />
       </div>

@@ -11,12 +11,13 @@ export interface WrongWordListProps {
   removeWord(wrongWord: string): void;
   loadMore();
   dictionaryManager: DictionaryManager;
+  showShowMore: boolean;
   setDebug?(message: string): void;
 }
 
 export default class WrongWordList extends React.Component<WrongWordListProps> {
   render() {
-    const { items, message, recheck, recheckDisabled, removeWord, loadMore, dictionaryManager, setDebug } = this.props;
+    const { items, message, recheck, recheckDisabled, removeWord, loadMore, dictionaryManager, showShowMore, setDebug } = this.props;
 
     return (
       <main className="ms-welcome__main">
@@ -28,7 +29,7 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
                 iconProps={{ iconName: "Refresh" }}
                 onClick={recheck}
                 disabled={recheckDisabled}
-                style={{backgroundColor: "transparent"}}
+                // style={{backgroundColor: "transparent"}}
             >
                 Recheck
             </Button>
@@ -55,7 +56,7 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
               )}
           </tbody>
         </table>
-        {items.length < 1 ? null : (
+        {(items.length < 1 || !showShowMore) ? null : (
             <DefaultButton
                 text="Show more"
                 onClick={() => loadMore()}
