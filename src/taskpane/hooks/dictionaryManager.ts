@@ -1,9 +1,9 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import FuzzySet from 'fuzzyset'
-import {url} from "../../config";
 import {WrongWord} from "../components/SingleWrongWord";
 import {unique} from "../utils/utils";
+import * as config from "../../config"
 
 export interface DictionaryManager {
     weHaveADictionary(): boolean;
@@ -45,9 +45,6 @@ interface Dictionary extends PersistedDictionary{
 }
 
 type OptionalDictionary = Dictionary | null;
-
-const dictionaryStorageKey = 'lingoDictionary_v2';
-const language = 'Luganda';
 
 const minSimilarityScore = .7;
 
@@ -123,7 +120,7 @@ export function useDictionaryManager(): DictionaryManager {
         if (ongoingAPICall) return;
 
         setOngoingAPICall(true);
-        api.fetchDictionary(language)
+        api.fetchDictionary(config.language)
         .then((apiDictionary: APIDictionary) => {
             const persistedDictionary: PersistedDictionary = (
                 dictionary ?
@@ -146,7 +143,7 @@ export function useDictionaryManager(): DictionaryManager {
 
     useEffect(() => {
         if (!dictionary) return;
-        api.suggestWords(language, dictionary.globalSuggestions.filter(suggestion => !suggestion.synced).map(suggestion => suggestion.word))
+        api.suggestWords(config.language, dictionary.globalSuggestions.filter(suggestion => !suggestion.synced).map(suggestion => suggestion.word))
             .then((words: APIWord[]) => noteDownSyncedSuggestions(words.map(word => word.word)));
     }, []);
 
@@ -163,21 +160,25 @@ export function useDictionaryManager(): DictionaryManager {
     };
 }
 
+const axiosInstance = axios.create({
+    baseURL: config.apiURL,
+    timeout: 30000,
+});
 const api = {
     fetchDictionary(languageName: string): Promise<APIDictionary> {
-        return axios.get(`${url}/languages/${languageName}/dictionaries/versions/latest`).then(result => result.data.data).catch(console.error);
+        return axiosInstance.get(`/languages/${languageName}/dictionaries/versions/latest`).then(result => result.data.data).catch(console.error);
     },
     suggestWords(languageName: string, words: string[]): Promise<APIWord[]> {
-        return axios.post(`${url}/languages/${languageName}/suggestions`, {words}).then(result => result.data.data).catch(console.error);
+        return axiosInstance.post(`/languages/${languageName}/suggestions`, {words}).then(result => result.data.data).catch(console.error);
     },
     checkWeHaveTheLatestVersion(dictionary: OptionalDictionary) {
         if (!dictionary) return Promise.resolve(false);
-        return axios.get(`${url}/dictionaries/versions/${dictionary.id}/is_latest`).then(result => result.data.data.is_latest).catch(console.error);
+        return axiosInstance.get(`$/dictionaries/versions/${dictionary.id}/is_latest`).then(result => result.data.data.is_latest).catch(console.error);
     },
 };
 
 function loadDictionary(): OptionalDictionary {
-    const savedDictionary = localStorage.getItem(dictionaryStorageKey);
+    const savedDictionary = localStorage.getItem(config.dictionaryStorageKey);
 
     if (savedDictionary === null) return null;
     else {
@@ -193,6 +194,6 @@ function loadDictionary(): OptionalDictionary {
 }
 
 function saveDictionary(apiDictionary: PersistedDictionary): Dictionary {
-    localStorage.setItem(dictionaryStorageKey, JSON.stringify(apiDictionary))
+    localStorage.setItem(config.dictionaryStorageKey, JSON.stringify(apiDictionary))
     return loadDictionary();
 }
