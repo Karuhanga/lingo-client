@@ -1,4 +1,4 @@
-import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react";
+import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react/lib/Button";
 import * as React from "react";
 import {useDocumentManager} from "../hooks/documentManager";
 import {DictionaryManager} from "../hooks/dictionaryManager";

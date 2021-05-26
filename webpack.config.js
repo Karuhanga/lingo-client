@@ -18,7 +18,7 @@ module.exports = async (env, options)  => {
         'react',
         'react-dom',
         'core-js',
-        'office-ui-fabric-react'
+        // 'office-ui-fabric-react' // build size optimization
     ],
     taskpane: [
         'react-hot-loader/patch',

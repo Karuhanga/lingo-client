@@ -22,6 +22,10 @@
 ### Architecture
 ![alt text](./designNotes/architecture.png)
 
+
+### Gotchas
+- [Build size](https://github.com/OfficeDev/generator-office/issues/427#issuecomment-651861161)- Make sure you use selective imports to avoid pulling in alot of unnecessary code in the build. Not doing this leads to a build size of >5mb == terrible
+
 ### Bootstrapped by
 This repository contains the source code used by the [Yo Office generator](https://github.com/OfficeDev/generator-office) when you create a new Office Add-in that appears in the task pane. You can also use this repository as a sample to base your own project from if you choose not to use the generator. 
 

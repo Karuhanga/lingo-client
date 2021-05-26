@@ -5,7 +5,7 @@ import WrongWordList from "./WrongWordList";
 import Progress from "./Progress";
 import {useEffect, useState} from "react";
 import useInterval from "@use-it/interval";
-import {PrimaryButton} from "office-ui-fabric-react";
+import {PrimaryButton} from "office-ui-fabric-react/lib/Button";
 
 // images references in the manifest
 import "../../../assets/icon-16.png";

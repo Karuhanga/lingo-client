@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react";
+import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react/lib/Button";
 import {SingleWrongWord, WrongWord} from "./SingleWrongWord";
 import {DictionaryManager} from "../hooks/dictionaryManager";
 
