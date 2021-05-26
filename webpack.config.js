@@ -14,12 +14,13 @@ module.exports = async (env, options)  => {
   const config = {
     devtool: "source-map",
     entry: {
-      vendor: [
-        'react',
-        'react-dom',
-        'core-js',
-        // 'office-ui-fabric-react' // build size optimization
-    ],
+    // build size optimization: https://github.com/OfficeDev/generator-office/issues/427#issuecomment-603985966
+    //   vendor: [
+    //     'react',
+    //     'react-dom',
+    //     'core-js',
+    //     'office-ui-fabric-react'
+    // ],
     taskpane: [
         'react-hot-loader/patch',
         './src/taskpane/index.tsx',

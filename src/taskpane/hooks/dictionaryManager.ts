@@ -92,7 +92,6 @@ export function useDictionaryManager(): DictionaryManager {
     }
 
     function noteDownSyncedSuggestions(words: string[]) {
-        console.log(words)
         const persistedDictionary: PersistedDictionary = {
             id: dictionary.id,
             words: dictionary.words,
@@ -173,7 +172,7 @@ const api = {
     },
     checkWeHaveTheLatestVersion(dictionary: OptionalDictionary) {
         if (!dictionary) return Promise.resolve(false);
-        return axiosInstance.get(`$/dictionaries/versions/${dictionary.id}/is_latest`).then(result => result.data.data.is_latest).catch(console.error);
+        return axiosInstance.get(`/dictionaries/versions/${dictionary.id}/is_latest`).then(result => result.data.data.is_latest).catch(console.error);
     },
 };
 

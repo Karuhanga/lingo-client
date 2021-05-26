@@ -1,4 +1,3 @@
-import InsertLocation = Word.InsertLocation;
 import {removeSpaces, unique} from "../utils/utils";
 
 interface DocumentManager {
@@ -32,7 +31,7 @@ export function useDocumentManager(setDebug?): DocumentManager {
             if (setDebug) setDebug(JSON.stringify(searchResults.toJSON()));
 
             searchResults.items.forEach(item => {
-                item.insertText(replacement, InsertLocation.replace);
+                item.insertText(replacement, Word.InsertLocation.replace);
             });
 
             // Synchronize the document state by executing the queued commands,
