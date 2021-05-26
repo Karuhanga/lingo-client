@@ -54,8 +54,7 @@ export function useDictionaryManager(): DictionaryManager {
 
     function checkSpellings(toCheck: string[]): Promise<string[]> {
         return Promise.resolve(
-            toCheck
-            .filter(word => !dictionary.indexedWords[word])
+            toCheck.filter(word => !dictionary.indexedWords[word])
         );
     }
 
@@ -184,9 +183,12 @@ function loadDictionary(): OptionalDictionary {
         const dictionary: PersistedDictionary = JSON.parse(savedDictionary);
         const words = unique([...dictionary.words, ...dictionary.localWords, ...dictionary.globalSuggestions.map(globalSuggestion => globalSuggestion.word)]);
 
+        const indexedWords = {};
+        words.forEach(word => indexedWords[word] = true);
+
         return {
             ...dictionary,
-            indexedWords: words.reduce((previousValue, currentValue) => ({...previousValue, [currentValue]: true}), {}),
+            indexedWords,
             spellChecker: new FuzzySet(words),
         }
     }
