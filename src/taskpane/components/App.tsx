@@ -59,7 +59,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
 
   if (!isOfficeInitialized) {
     return (
-        <Progress title={title} logo="assets/logo.png" message="Please sideload your addin to see app body." />
+        <Progress title={title} logo="assets/logo.png" message="Just a second more..." />
     );
   }
 
