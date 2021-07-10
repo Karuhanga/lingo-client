@@ -13,6 +13,8 @@
 
 ### Pending;
 - move words to infinite scroll
+- highlight word when clicked
+- ui freezing up while fetching words
 - improve auto refresh, performance compromise- right now, we have to choose one- auto refresh/ view more words
 
 ### Nice to have;
