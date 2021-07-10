@@ -15,7 +15,6 @@ export function useDocumentManager(setDebug?): DocumentManager {
     function getDocumentWords() {
         return Word.run(async context => {
             const body = context.document.body.load('text');
-            body.load('text');
             await context.sync();
 
             return cleanText(body.text);

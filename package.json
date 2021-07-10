@@ -12,7 +12,7 @@
     "dev-server-port": 3000
   },
   "scripts": {
-    "build": "webpack -p --mode production --https false && rm -rf ./docs && mv ./dist ./docs",
+    "build": "webpack -p --mode production --https false && rm -rf ./docs && mv ./dist ./docs && cp ./assets/privacy-policy.html ./docs/privacy-policy.html",
     "build:dev": "webpack --mode development --https false",
     "build-dev": "webpack --mode development --https false && echo . && echo . && echo . && echo Please use 'build:dev' instead of 'build-dev'.",
     "dev-server": "webpack-dev-server --mode development",
