@@ -10,6 +10,7 @@ import {PrimaryButton} from "office-ui-fabric-react/lib/Button";
 // images references in the manifest
 import "../../../assets/icon-16.png";
 import "../../../assets/icon-32.png";
+import "../../../assets/icon-64.png";
 import "../../../assets/icon-80.png";
 import {WrongWord} from "./SingleWrongWord";
 import {useDictionaryManager} from "../hooks/dictionaryManager";
@@ -55,7 +56,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
     setWrongWordsWithSuggestions(wrongWords.slice(0, count).map(dictionaryManager.suggestCorrections))
   }, [count, wrongWords]);
 
-  useInterval(() => autoRefreshOn && runSpellCheck(), 15000);
+  useInterval(() => autoRefreshOn && runSpellCheck(), 15 * 1000);
 
   if (!isOfficeInitialized) {
     return (
