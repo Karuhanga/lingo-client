@@ -12,24 +12,6 @@
 <body>
 
 <div class="page">
-<input id="en" checked="checked" type="radio" name="languages">
-<header class="header">
-<div class="container">
-<span class="logo">Privacy Policy for Luganda Spell Checker</span>
-</div>
-</header>
-<div class="subnav">
-<div class="container">
-<input class="menu-btn" type="checkbox" id="menu-btn">
-<label class="menu-icon" for="menu-btn"><span class="navicon"></span> <span class="label-name">Languages</span></label>
-<ul class="menu">
-<li class="en language_label active" label-language="en">
-<label for="en">English</label>
-</li>
-</ul>
-
-</div>
-</div>
 
 
 <section>
@@ -139,13 +121,6 @@ Cookies or to indicate when a Cookie is being sent. However, if You do
 not accept Cookies, You may not be able to use some parts of our 
 Service. Unless you have adjusted Your browser setting so that it will 
 refuse Cookies, our Service may use Cookies.</li>
-<li><strong>Flash Cookies.</strong> Certain features of our Service may 
-use local stored objects (or Flash Cookies) to collect and store 
-information about Your preferences or Your activity on our Service. 
-Flash Cookies are not managed by the same browser settings as those used
- for Browser Cookies. For more information on how You can delete Flash 
-Cookies, please read "Where can I change the settings for disabling, or 
-deleting local shared objects?" available at <a href="https://helpx.adobe.com/flash-player/kb/disable-local-shared-objects-flash.html#main_Where_can_I_change_the_settings_for_disabling__or_deleting_local_shared_objects_" rel="external nofollow noopener" target="_blank">https://helpx.adobe.com/flash-player/kb/disable-local-shared-objects-flash.html#main_Where_can_I_change_the_settings_for_disabling__or_deleting_local_shared_objects_</a></li>
 <li><strong>Web Beacons.</strong> Certain sections of our Service and 
 our emails may contain small electronic files known as web beacons (also
  referred to as clear gifs, pixel tags, and single-pixel gifs) that 
@@ -357,40 +332,5 @@ Privacy Policy for Luganda Spell Checker
 </footer>
 
 </div>
-<script type="text/javascript" src="privacy-policy_files/jquery.js"></script>
-<script type="text/javascript" defer="defer">
-    $(document).ready(function () {
-        let language_label = $('.language_label');
-        function selectFirstLanguage() {
-            language_label.each(function(index, element) {
-                let language = $(element).attr('label-language');
-                selectLanguage(language);
-                return false;
-            });
-        }
-        // Language selection function
-        function selectLanguage(language) {
-            language_label.removeClass('active');
-            $('.section_container').removeClass('active');
-
-            $(".language_label[label-language='" + language +"']").addClass('active');
-            $(".section_container[section-language='" + language +"']").addClass('active');
-
-            $("html, body").animate({scrollTop: 0}, "slow");
-        }
-        // Automatically select the first language
-        selectFirstLanguage();
-
-        $('.language_label').click(function () {
-          language_label.click(function () {
-              var labelLanguage = $(this).attr('label-language');
-              selectLanguage(labelLanguage);
-          });
-        });
-    });
-</script>
-<script src="privacy-policy_files/js-code" type="text/javascript" async="true"></script>
-<script src="privacy-policy_files/js-data" type="text/javascript" async="true"></script>
-<img src="privacy-policy_files/px.gif" style="position:fixed;right:0px;bottom:0px;display:none;">
 
 </body></html>
