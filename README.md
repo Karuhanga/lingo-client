@@ -3,6 +3,12 @@
 ### Prod;
 - [Client Service](https://karuhanga.github.io/lingo-client/taskpane.html)
 
+
+### Minimum Supported Versions
+- Office for Windows: 2013
+- Office for Mac: 2016
+- Word for Web: Since September 2016
+
 ### To run;
 - (If on mac) run `npm run dev-server`
 - Run `npm start`
