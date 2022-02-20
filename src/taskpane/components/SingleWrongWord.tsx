@@ -7,19 +7,18 @@ export interface WrongWord {wrong: string, suggestions: string[]}
 
 export interface SingleWrongWordProps {
     wrongWord: WrongWord;
-    index: number;
     removeWord(wrongWord: string): void;
     dictionaryManager: DictionaryManager;
     setDebug?(message: string): void;
 }
 
-export function SingleWrongWord({wrongWord, index, removeWord, dictionaryManager, setDebug}: SingleWrongWordProps) {
+export function SingleWrongWord({wrongWord, removeWord, dictionaryManager, setDebug}: SingleWrongWordProps) {
     const firstSuggestion = wrongWord.suggestions[0];
     const weHaveSuggestions = !!firstSuggestion;
     const documentManager = useDocumentManager(setDebug);
 
     return (
-        <tr key={index}>
+        <tr>
             <td style={{maxWidth: '100px'}}>
                 <DefaultButton
                     split

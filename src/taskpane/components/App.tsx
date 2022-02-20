@@ -35,19 +35,49 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
     await setWrongWords(wrongWords.filter(word => word !== wrongWord));
   }
 
+    function timeGetWords(d) {
+        console.timeEnd("get words");
+        console.time("check spellings");
+        return d;
+    }
+
+    function timeCheckSpellings(d) {
+        console.timeEnd("check spellings");
+        console.time("set words");
+        return d;
+    }
+
+    function timeSetWords(d) {
+        console.timeEnd("set words");
+        return d;
+    }
+
+    function onAnimationFrame(run) {
+        return new Promise((resolve: (result: Promise<string[]>) => void) => {
+            resolve(run());
+            // requestAnimationFrame(() => {
+            //     resolve(run());
+            // });
+        })
+    }
+
   function runSpellCheck() {
     if (dictionaryManager.weHaveADictionary() && !checking) {
       setChecking(true);
 
-      new Promise((resolve: (result: Promise<string[]>) => void) => {
-        requestAnimationFrame(() => resolve(documentManager.getWords()));
+      onAnimationFrame(() => {
+          console.time("get words");
+          return documentManager.getWords();
       })
+      .then(timeGetWords)
       // asyncCheckSpellings if we hit a performance bottleneck. todo: test on 10000 words
-      .then(dictionaryManager.checkSpellings)
-      .then(newWrongWords => {
-        if (autoRefreshOn) setCount(initialListCount);
-        setWrongWords(newWrongWords);
-      })
+      .then(words => onAnimationFrame(() => dictionaryManager.checkSpellings(words)))
+      .then(timeCheckSpellings)
+      .then(wrongWords => onAnimationFrame(() => {
+          if (autoRefreshOn) setCount(initialListCount);
+          setWrongWords(wrongWords);
+      }))
+      .then(timeSetWords)
       .finally(() => setChecking(false));
     }
   }
