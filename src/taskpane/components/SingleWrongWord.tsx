@@ -3,10 +3,10 @@ import * as React from "react";
 import {useDocumentManager} from "../hooks/documentManager";
 import {DictionaryManager} from "../hooks/dictionaryManager";
 
-export interface WrongWord {wrong: string, suggestions: string[]}
+export interface WrongWordSuggestion {wrong: string, suggestions: string[]}
 
 export interface SingleWrongWordProps {
-    wrongWord: WrongWord;
+    wrongWord: WrongWordSuggestion;
     removeWord(wrongWord: string): void;
     dictionaryManager: DictionaryManager;
     setDebug?(message: string): void;

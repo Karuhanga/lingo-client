@@ -1,9 +1,11 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import FuzzySet from 'fuzzyset'
-import {WrongWord} from "../components/SingleWrongWord";
+import {WrongWordSuggestion} from "../components/SingleWrongWord";
 import {unique} from "../utils/utils";
 import * as config from "../../config"
+import * as bundledDictionary from "../../bundledDictionary";
+import {useRemoteDictionary} from "../../config";
 
 export interface DictionaryManager {
     weHaveADictionary(): boolean;
@@ -11,7 +13,7 @@ export interface DictionaryManager {
     dictionaryUpdating: boolean;
     checkSpellings(toCheck: string[]): Promise<string[]>;
     retryDictionaryDownload();
-    suggestCorrections(word: string, correctionCount: 5): WrongWord;
+    suggestCorrections(word: string, correctionCount: 5): WrongWordSuggestion;
     addWordLocal(word: string);
     addWordGlobal(word: string);
     clearLocalDictionary();
@@ -58,7 +60,7 @@ export function useDictionaryManager(): DictionaryManager {
         );
     }
 
-    function suggestCorrections(word: string): WrongWord {
+    function suggestCorrections(word: string): WrongWordSuggestion {
         const result: [number, string] = dictionary.spellChecker.get(word, [], minSimilarityScore);
         return {
             wrong: word,
@@ -116,18 +118,31 @@ export function useDictionaryManager(): DictionaryManager {
 
     function mutexFetchDictionary() {
         if (ongoingAPICall) return;
-
         setOngoingAPICall(true);
-        api.fetchDictionary(config.language)
-        .then((apiDictionary: APIDictionary) => {
+
+        if (useRemoteDictionary) {
+            api.fetchDictionary(config.language)
+                .then((apiDictionary: APIDictionary) => {
+                    const persistedDictionary: PersistedDictionary = (
+                        dictionary ?
+                            {...dictionary, ...apiDictionary} :
+                            {localWords: [], globalSuggestions: [], ...apiDictionary}
+                    );
+                    setDictionary(saveDictionary(persistedDictionary));
+                })
+                .finally(() => setOngoingAPICall(false));
+        } else {
+            const apiDictionary: APIDictionary = {
+                id: bundledDictionary.id, language: bundledDictionary.language, words: bundledDictionary.words,
+            };
             const persistedDictionary: PersistedDictionary = (
                 dictionary ?
                     {...dictionary, ...apiDictionary} :
                     {localWords: [], globalSuggestions: [], ...apiDictionary}
             );
             setDictionary(saveDictionary(persistedDictionary));
-        })
-        .finally(() => setOngoingAPICall(false));
+            setOngoingAPICall(false);
+        }
     }
 
     useEffect(() => {
@@ -169,8 +184,9 @@ const api = {
     suggestWords(languageName: string, words: string[]): Promise<APIWord[]> {
         return axiosInstance.post(`/languages/${languageName}/suggestions`, {words}).then(result => result.data.data).catch(console.error);
     },
-    checkWeHaveTheLatestVersion(dictionary: OptionalDictionary) {
+    checkWeHaveTheLatestVersion(dictionary: OptionalDictionary): Promise<boolean> {
         if (!dictionary) return Promise.resolve(false);
+        if (!useRemoteDictionary) return Promise.resolve(dictionary.id === bundledDictionary.id);
         return axiosInstance.get(`/dictionaries/versions/${dictionary.id}/is_latest`).then(result => result.data.data.is_latest).catch(console.error);
     },
 };

@@ -12,7 +12,7 @@ import "../../../assets/icon-16.png";
 import "../../../assets/icon-32.png";
 import "../../../assets/icon-64.png";
 import "../../../assets/icon-80.png";
-import {WrongWord} from "./SingleWrongWord";
+import {WrongWordSuggestion} from "./SingleWrongWord";
 import {useDictionaryManager} from "../hooks/dictionaryManager";
 import {useDocumentManager} from "../hooks/documentManager";
 
@@ -25,7 +25,7 @@ const initialListCount = 20;
 export default function App({ title, isOfficeInitialized }: AppProps) {
   const [count, setCount] = useState(initialListCount);
   const [wrongWords, setWrongWords] = useState<string[]>([]);
-  const [wrongWordsWithSuggestions, setWrongWordsWithSuggestions] = useState<WrongWord[]>([]);
+  const [wrongWordsWithSuggestions, setWrongWordsWithSuggestions] = useState<WrongWordSuggestion[]>([]);
   const [checking, setChecking] = useState(false);
   const dictionaryManager = useDictionaryManager();
   const documentManager = useDocumentManager();
@@ -97,7 +97,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
   if (!dictionaryManager.weHaveADictionary()) {
     if (dictionaryManager.dictionaryUpdating) {
       return (
-          <Progress title="Setting up..." logo="assets/logo.png" message="Downloading your dictionary. This will be a one time thing. Promise 🙃" />
+          <Progress title="Setting up..." logo="assets/logo.png" message="Loading dictionary..." />
       )
     } else {
       return (

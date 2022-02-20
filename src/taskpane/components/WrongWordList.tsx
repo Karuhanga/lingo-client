@@ -1,11 +1,11 @@
 import * as React from "react";
 import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react/lib/Button";
-import {SingleWrongWord, WrongWord} from "./SingleWrongWord";
+import {SingleWrongWord, WrongWordSuggestion} from "./SingleWrongWord";
 import {DictionaryManager} from "../hooks/dictionaryManager";
 
 export interface WrongWordListProps {
   message: string;
-  items: WrongWord[];
+  items: WrongWordSuggestion[];
   recheck(): void;
   recheckDisabled: boolean;
   removeWord(wrongWord: string): void;
