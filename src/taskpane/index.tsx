@@ -1,5 +1,5 @@
 import "office-ui-fabric-react/dist/css/fabric.min.css";
-import App from "./components/App";
+import App from "./ui/App";
 import { AppContainer } from "react-hot-loader";
 import { initializeIcons } from "office-ui-fabric-react/lib/Icons";
 import * as React from "react";
@@ -28,9 +28,9 @@ Office.initialize = () => {
 
 if ((module as any).hot) {
   (module as any).hot.accept("./components/App", () => {
-    if(!isOfficeInitialized) return;
+    if (!isOfficeInitialized) return;
 
-    const NextApp = require("./components/App").default;
+    const NextApp = require("./ui/App").default;
     render(NextApp);
   });
 }

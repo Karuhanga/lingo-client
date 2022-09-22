@@ -1,11 +1,11 @@
 import * as React from "react";
 import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react/lib/Button";
-import {SingleWrongWord, WrongWordSuggestion} from "./SingleWrongWord";
-import {DictionaryManager} from "../hooks/dictionaryManager";
+import {SingleWrongWord} from "./SingleWrongWord";
+import {DictionaryManager} from "../data/dictionaryManager";
 
 export interface WrongWordListProps {
   message: string;
-  items: WrongWordSuggestion[];
+  items: string[];
   recheck(): void;
   recheckDisabled: boolean;
   removeWord(wrongWord: string): void;
@@ -52,7 +52,7 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
         <table className="ms-font-m ms-fontColor-neutralPrimary">
           <tbody>
               {items.map((wrongWord) =>
-                  <SingleWrongWord key={wrongWord.wrong} wrongWord={wrongWord} removeWord={removeWord} dictionaryManager={dictionaryManager} setDebug={setDebug} />
+                  <SingleWrongWord key={wrongWord} word={wrongWord} removeWord={removeWord} dictionaryManager={dictionaryManager} setDebug={setDebug} />
               )}
           </tbody>
         </table>

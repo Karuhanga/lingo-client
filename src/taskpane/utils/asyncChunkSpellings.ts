@@ -1,5 +1,5 @@
 import {asyncChunk} from "./asyncChunk";
-import {DictionaryManager} from "../hooks/dictionaryManager";
+import {DictionaryManager} from "../data/dictionaryManager";
 
 export function asyncCheckSpellings(words: string[], dictionaryManager: DictionaryManager): Promise<string[]> {
     return asyncChunk<string, string>(

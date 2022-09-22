@@ -1,10 +1,13 @@
-import {removeSpaces, unique} from "../utils/utils";
+import {removeSpaces, unique} from "../utils/stringUtils";
 
 interface DocumentManager {
-    getWords(): Promise<string[]>;
+    getWords(sectionNumber: number): Promise<string[]>;
     replaceWord(word: string, replacement: string): Promise<void>;
     jumpToWord(word: string);
+    getSectionCount(): Promise<number>;
 }
+
+export const sectionNotFoundMessage = "Section not found";
 
 export function useDocumentManager(setDebug?): DocumentManager {
     function cleanText(text) {
@@ -12,12 +15,20 @@ export function useDocumentManager(setDebug?): DocumentManager {
         return unique(removeSpaces(text.toLowerCase().split(/\s+/)));
     }
 
-    function getDocumentWords() {
+    function getSectionWords(sectionNumber: number) {
         return Word.run(async context => {
-            const body = context.document.body.load('text');
+            const section = context.document.sections.items[sectionNumber];
+            if (!section) throw new Error(sectionNotFoundMessage);
+            const sectionText = section.body.load('text');
             await context.sync();
 
-            return cleanText(body.text);
+            return cleanText(sectionText.text);
+        });
+    }
+
+    function getSectionCount() {
+        return Word.run(async context => {
+            return context.document.sections.items.length;
         });
     }
 
@@ -44,8 +55,9 @@ export function useDocumentManager(setDebug?): DocumentManager {
     }
 
     return {
-        getWords: getDocumentWords,
+        getWords: getSectionWords,
         replaceWord,
         jumpToWord,
+        getSectionCount,
     }
 }
