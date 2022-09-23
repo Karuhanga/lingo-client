@@ -2,6 +2,7 @@ import * as React from "react";
 import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react/lib/Button";
 import {SingleWrongWord} from "./SingleWrongWord";
 import {DictionaryManager} from "../data/dictionaryManager";
+import {DocumentManager} from "../data/documentManager";
 
 export interface WrongWordListProps {
   message: string;
@@ -9,6 +10,7 @@ export interface WrongWordListProps {
   runCheck(): void;
   recheckDisabled: boolean;
   removeWord(wrongWord: string): void;
+  documentManager: DocumentManager;
   loadMore();
   dictionaryManager: DictionaryManager;
   showShowMore: boolean;
@@ -17,7 +19,7 @@ export interface WrongWordListProps {
 
 export default class WrongWordList extends React.Component<WrongWordListProps> {
   render() {
-    const { items, message, runCheck, recheckDisabled, removeWord, loadMore, dictionaryManager, showShowMore, setDebug } = this.props;
+    const { items, message, runCheck, recheckDisabled, removeWord, documentManager, loadMore, dictionaryManager, showShowMore, setDebug } = this.props;
 
     return (
       <main className="ms-welcome__main">
@@ -52,7 +54,7 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
         <table className="ms-font-m ms-fontColor-neutralPrimary">
           <tbody>
               {items.map((wrongWord) =>
-                  <SingleWrongWord key={wrongWord} word={wrongWord} removeWord={removeWord} dictionaryManager={dictionaryManager} setDebug={setDebug} />
+                  <SingleWrongWord key={wrongWord} word={wrongWord} removeWord={removeWord} dictionaryManager={dictionaryManager} setDebug={setDebug} documentManager={documentManager} />
               )}
           </tbody>
         </table>

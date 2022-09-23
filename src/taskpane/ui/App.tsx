@@ -24,7 +24,7 @@ const initialListCount = 20;
 export default function App({ title, isOfficeInitialized }: AppProps) {
     const dictionaryManager = useDictionaryManager();
     const [showNWords, setShowNWords] = useState(initialListCount);
-    const {isSpellChecking, removeWrongWord, wrongWords, runSpellCheck} = useSpellChecker();
+    const {removeWrongWord, wrongWords, runSpellCheck, documentManager} = useSpellChecker();
 
     if (!isOfficeInitialized) {
         return (
@@ -55,11 +55,12 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
             <Header logo="assets/logo.png" title={title} message="Spell Checker" />
             <WrongWordList
                 message="Possible misspellings"
-                recheckDisabled={isSpellChecking}
+                recheckDisabled={false}
                 runCheck={() => {
                     runSpellCheck();
                 }}
                 items={wrongWords}
+                documentManager={documentManager}
                 removeWord={removeWrongWord}
                 loadMore={() => {
                     setShowNWords(showNWords + 20);

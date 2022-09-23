@@ -28,7 +28,7 @@ module.exports = async (env, options)  => {
     commands: './src/commands/commands.ts'
     },
     resolve: {
-      extensions: [".ts", ".tsx", ".html", ".js"]
+      extensions: [".ts", ".tsx", ".html", ".js", ".mjs"]
     },
     module: {
       rules: [
@@ -50,6 +50,11 @@ module.exports = async (env, options)  => {
           options: {
             name: '[path][name].[ext]',          
           }
+        },
+        {
+          test: /\.mjs$/,
+          include: /node_modules/,
+          type: 'javascript/auto'
         }
       ]
     },    
