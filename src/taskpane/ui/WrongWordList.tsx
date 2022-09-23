@@ -6,7 +6,7 @@ import {DictionaryManager} from "../data/dictionaryManager";
 export interface WrongWordListProps {
   message: string;
   items: string[];
-  recheck(): void;
+  runCheck(): void;
   recheckDisabled: boolean;
   removeWord(wrongWord: string): void;
   loadMore();
@@ -17,7 +17,7 @@ export interface WrongWordListProps {
 
 export default class WrongWordList extends React.Component<WrongWordListProps> {
   render() {
-    const { items, message, recheck, recheckDisabled, removeWord, loadMore, dictionaryManager, showShowMore, setDebug } = this.props;
+    const { items, message, runCheck, recheckDisabled, removeWord, loadMore, dictionaryManager, showShowMore, setDebug } = this.props;
 
     return (
       <main className="ms-welcome__main">
@@ -26,12 +26,12 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
             &nbsp;
             <Button
                 buttonType={ButtonType.icon}
-                iconProps={{ iconName: "Refresh" }}
-                onClick={recheck}
+                iconProps={{ iconName: "EditStyle" }}
+                onClick={runCheck}
                 disabled={recheckDisabled}
                 // style={{backgroundColor: "transparent"}}
             >
-                Recheck
+                Check
             </Button>
             <Button
                 split

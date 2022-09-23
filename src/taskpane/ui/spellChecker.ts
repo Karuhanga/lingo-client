@@ -1,6 +1,6 @@
 import {useDictionaryManager} from "../data/dictionaryManager";
-import {sectionNotFoundMessage, useDocumentManager} from "../data/documentManager";
-import {useMemo, useState} from "react";
+import {sectionNotFoundMessage, useDocumentManager} from "../data/document/documentManager";
+import {useEffect, useMemo, useState} from "react";
 import {onTimeWindow} from "../utils/asyncUtils";
 import useInterval from "@use-it/interval";
 import {cloneDeep, union} from "lodash";
@@ -30,7 +30,7 @@ export function useSpellChecker (): SpellChecker {
             nextWrongWords.push(...(wrongWordsBySection[i] || []));
         }
 
-        return union([nextWrongWords]);
+        return union(nextWrongWords);
     }, [wrongWordsBySection, sectionCount]);
 
     async function removeWrongWord(wrongWord: string) {
@@ -90,6 +90,7 @@ export function useSpellChecker (): SpellChecker {
 
     useInterval(() => runSpellCheck(), spellCheckEverySeconds * 1000);
     useInterval(() => documentManager.getSectionCount().then(setSectionCount), updateSectionCountEverySeconds * 1000);
+    useEffect(() => console.log(nextSectionToSpellCheck, "nextSectionToSpellCheck"), [nextSectionToSpellCheck]);
 
     return {
         isSpellChecking,

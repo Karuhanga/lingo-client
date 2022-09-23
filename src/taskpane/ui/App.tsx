@@ -28,7 +28,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
 
     if (!isOfficeInitialized) {
         return (
-            <Progress title={title} logo="assets/logo.png" message="Just a second more..." />
+            <Progress title={title} logo="assets/logo.png" message="Just a second..." />
         );
     }
 
@@ -56,7 +56,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
             <WrongWordList
                 message="Possible misspellings"
                 recheckDisabled={isSpellChecking}
-                recheck={() => {
+                runCheck={() => {
                     runSpellCheck();
                 }}
                 items={wrongWords}

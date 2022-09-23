@@ -1,6 +1,6 @@
 import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react/lib/Button";
 import * as React from "react";
-import {useDocumentManager} from "../data/documentManager";
+import {useDocumentManager} from "../data/document/documentManager";
 import {DictionaryManager} from "../data/dictionaryManager";
 
 export interface WrongWordSuggestion {wrong: string, suggestions: string[]}

@@ -1,4 +1,5 @@
 ## Lingo Client
+[Project Docs](https://docs.google.com/document/d/1Ackz0l2ix9Cd8XQw5h_hh0SCI3T0raT1b7vVhfERrVU)
 
 ### Prod;
 - [Client Service](https://lug-spell.github.io/client/taskpane.html)

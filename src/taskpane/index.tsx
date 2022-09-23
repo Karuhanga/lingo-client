@@ -27,7 +27,7 @@ Office.initialize = () => {
 };
 
 if ((module as any).hot) {
-  (module as any).hot.accept("./components/App", () => {
+  (module as any).hot.accept("./ui/App", () => {
     if (!isOfficeInitialized) return;
 
     const NextApp = require("./ui/App").default;
