@@ -1,7 +1,7 @@
-import {getSectionWords, replaceWord, jumpToWord, getSectionCount} from "./"
+import {getDocumentWords, replaceWord, jumpToWord, getSectionCount} from "./"
 
 interface DocumentManager {
-    getWords(sectionNumber: number): Promise<string[]>;
+    getWords(): Promise<string[]>;
     replaceWord(word: string, replacement: string): Promise<void>;
     jumpToWord(word: string);
     getSectionCount(): Promise<number>;
@@ -13,7 +13,7 @@ export function useDocumentManager(setDebug?): DocumentManager {
     if (setDebug) setDebug("using document manager");
 
     return {
-        getWords: getSectionWords,
+        getWords: getDocumentWords,
         replaceWord,
         jumpToWord,
         getSectionCount,

@@ -6,6 +6,15 @@ function cleanText(text) {
     return unique(removeSpaces(text.toLowerCase().split(/\s+/)));
 }
 
+export function getDocumentWords() {
+    return Word.run(async context => {
+        const body = context.document.body.load('text');
+        await context.sync();
+
+        return cleanText(body.text);
+    });
+}
+
 export function getSectionWords(sectionNumber: number) {
     return Word.run(async context => {
         const sections = context.document.sections;

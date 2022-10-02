@@ -61,7 +61,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
                     runCheck={() => {
                         runSpellCheck();
                     }}
-                    items={wrongWords}
+                    items={wrongWords.slice(0, showNWords)}
                     removeWrongWord={removeWrongWord}
                     loadMore={() => {
                         setShowNWords(showNWords + 20);
