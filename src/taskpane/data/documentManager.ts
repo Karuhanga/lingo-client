@@ -21,16 +21,24 @@ export function useDocumentManager({onSectionWordsReady, resetNextSectionToSpell
     useEffect(() => {
         getSectionCount.current = new window.Worker('./assets/scripts/workers/getSectionCount.js');
         getSectionCount.current.onerror = console.error;
+
+        // @ts-ignore
+        ViaReceiver.postMessage = (data => getSectionCount.current.postMessage(data));
         getSectionCount.current.onmessage = (e) => {
+            const {data: {messageType}} = e;
+            if (messageType !== "lingo") { // @ts-ignore
+                return ViaReceiver.OnMessage(e.data);
+            }
             setSectionCount(e.data.sectionCount as number);
         };
+
         return () => {
             getSectionCount.current.terminate();
             getSectionCount.current = null;
         };
     }, []);
     useInterval(() => {
-        getSectionCount.current?.postMessage({});
+        getSectionCount.current?.postMessage({messageType: "lingo"});
     }, updateSectionCountEverySeconds * 1000);
 
     useEffect(() => {
