@@ -8,7 +8,7 @@ export interface WrongWordListProps {
   items: string[];
   runCheck(): void;
   recheckDisabled: boolean;
-  removeWord(wrongWord: string): void;
+  removeWrongWord(wrongWord: string): void;
   loadMore();
   dictionaryManager: DictionaryManager;
   showShowMore: boolean;
@@ -17,7 +17,7 @@ export interface WrongWordListProps {
 
 export default class WrongWordList extends React.Component<WrongWordListProps> {
   render() {
-    const { items, message, runCheck, recheckDisabled, removeWord, loadMore, dictionaryManager, showShowMore, setDebug } = this.props;
+    const { items, message, runCheck, recheckDisabled, removeWrongWord, loadMore, dictionaryManager, showShowMore, setDebug } = this.props;
 
     return (
       <main className="ms-welcome__main">
@@ -52,10 +52,16 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
         <table className="ms-font-m ms-fontColor-neutralPrimary">
           <tbody>
               {items.map((wrongWord) =>
-                  <SingleWrongWord key={wrongWord} word={wrongWord} removeWord={removeWord} dictionaryManager={dictionaryManager} setDebug={setDebug} />
+                  <SingleWrongWord key={wrongWord} word={wrongWord} removeWrongWord={removeWrongWord} dictionaryManager={dictionaryManager} setDebug={setDebug} />
               )}
           </tbody>
         </table>
+          {items.length < 1 ? (
+              <div>
+                  <br/> <br/>
+                  <span className="ms-fontColor-neutralSecondary">Any misspellings will show up here</span>
+              </div>
+          ) : null}
         {(items.length < 1 || !showShowMore) ? null : (
             <DefaultButton
                 text="Show more"

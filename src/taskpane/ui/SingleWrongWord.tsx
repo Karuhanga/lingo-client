@@ -7,12 +7,12 @@ export interface WrongWordSuggestion {wrong: string, suggestions: string[]}
 
 export interface SingleWrongWordProps {
     word: string;
-    removeWord(wrongWord: string): void;
+    removeWrongWord(wrongWord: string): void;
     dictionaryManager: DictionaryManager;
     setDebug?(message: string): void;
 }
 
-export function SingleWrongWord({word, removeWord, dictionaryManager, setDebug}: SingleWrongWordProps) {
+export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDebug}: SingleWrongWordProps) {
     const wrongWord = dictionaryManager.suggestCorrections(word);
     const firstSuggestion = wrongWord.suggestions[0];
     const weHaveSuggestions = !!firstSuggestion;
@@ -41,7 +41,7 @@ export function SingleWrongWord({word, removeWord, dictionaryManager, setDebug}:
                             items: wrongWord.suggestions.map(suggestion => ({
                                 key: suggestion,
                                 text: suggestion,
-                                onClick: () => {documentManager.replaceWord(wrongWord.wrong, suggestion).then(() => removeWord(wrongWord.wrong))},
+                                onClick: () => {documentManager.replaceWord(wrongWord.wrong, suggestion).then(() => removeWrongWord(wrongWord.wrong))},
                             })),
                         }}
                     />
@@ -52,7 +52,7 @@ export function SingleWrongWord({word, removeWord, dictionaryManager, setDebug}:
                     <Button
                         buttonType={ButtonType.icon}
                         iconProps={{ iconName: "CheckMark" }}
-                        onClick={() => {documentManager.replaceWord(wrongWord.wrong, firstSuggestion).then(() => removeWord(wrongWord.wrong))}}
+                        onClick={() => {documentManager.replaceWord(wrongWord.wrong, firstSuggestion).then(() => removeWrongWord(wrongWord.wrong))}}
                     />
                 )}
             </td>
@@ -68,7 +68,7 @@ export function SingleWrongWord({word, removeWord, dictionaryManager, setDebug}:
                                 iconProps: { iconName: 'Add' },
                                 onClick: () => {
                                     dictionaryManager.addWordLocal(wrongWord.wrong);
-                                    removeWord(wrongWord.wrong);
+                                    removeWrongWord(wrongWord.wrong);
                                 },
                             },
                             {
@@ -77,7 +77,7 @@ export function SingleWrongWord({word, removeWord, dictionaryManager, setDebug}:
                                 iconProps: { iconName: 'World' },
                                 onClick: () => {
                                     dictionaryManager.addWordGlobal(wrongWord.wrong);
-                                    removeWord(wrongWord.wrong);
+                                    removeWrongWord(wrongWord.wrong);
                                 },
                             },
                         ],

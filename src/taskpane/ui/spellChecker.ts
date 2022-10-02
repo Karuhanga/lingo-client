@@ -12,10 +12,14 @@ interface SpellChecker {
     runSpellCheck(): void;
 }
 
-const spellCheckEverySeconds = 2;
+const spellCheckEverySeconds = 30;
 const updateSectionCountEverySeconds = 5;
 
 export function useSpellChecker (): SpellChecker {
+    /*
+    * Should be a singleton
+    * */
+
     const dictionaryManager = useDictionaryManager();
     const documentManager = useDocumentManager();
 
@@ -68,7 +72,6 @@ export function useSpellChecker (): SpellChecker {
                 return documentManager.getWords(nextSectionToSpellCheck);
             })
                 .then(timeGetWords)
-                // asyncCheckSpellings if we hit a performance bottleneck. todo: test on 10000 words
                 .then(words => onTimeWindow(() => dictionaryManager.checkSpellings(words)))
                 .then(timeCheckSpellings)
                 .then(wrongWordsForSection => onTimeWindow(() => {

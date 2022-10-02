@@ -9,7 +9,9 @@ interface DocumentManager {
 
 export const sectionNotFoundMessage = "Section not found";
 
-export function useDocumentManager(): DocumentManager {
+export function useDocumentManager(setDebug?): DocumentManager {
+    if (setDebug) setDebug("using document manager");
+
     return {
         getWords: getSectionWords,
         replaceWord,

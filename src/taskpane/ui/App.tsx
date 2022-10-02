@@ -14,6 +14,7 @@ import "../../../assets/icon-64.png";
 import "../../../assets/icon-80.png";
 import {useSpellChecker} from "./spellChecker";
 import {useDictionaryManager} from "../data/dictionaryManager";
+import {LoadingOverlay} from "./LoadingOverlay";
 
 export interface AppProps {
     title: string;
@@ -53,20 +54,22 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
     return (
         <div className="ms-welcome">
             <Header logo="assets/logo.png" title={title} message="Spell Checker" />
-            <WrongWordList
-                message="Possible misspellings"
-                recheckDisabled={isSpellChecking}
-                runCheck={() => {
-                    runSpellCheck();
-                }}
-                items={wrongWords}
-                removeWord={removeWrongWord}
-                loadMore={() => {
-                    setShowNWords(showNWords + 20);
-                }}
-                showShowMore={showNWords < wrongWords.length}
-                dictionaryManager={dictionaryManager}
-            />
+            <LoadingOverlay loading={isSpellChecking}>
+                <WrongWordList
+                    message="Possible misspellings"
+                    recheckDisabled={isSpellChecking}
+                    runCheck={() => {
+                        runSpellCheck();
+                    }}
+                    items={wrongWords}
+                    removeWrongWord={removeWrongWord}
+                    loadMore={() => {
+                        setShowNWords(showNWords + 20);
+                    }}
+                    showShowMore={showNWords < wrongWords.length}
+                    dictionaryManager={dictionaryManager}
+                />
+            </LoadingOverlay>
         </div>
     );
 }
