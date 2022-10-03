@@ -8,7 +8,7 @@
   <Description DefaultValue="A template to get started."/>
   <IconUrl DefaultValue="https://lug-spell.github.io/client//assets/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="https://lug-spell.github.io/client//assets/icon-64.png"/>
-  <SupportUrl DefaultValue="https://lug-spell.github.io/client//support.html"/>
+  <SupportUrl DefaultValue="https://lug-spell.github.io/client//assets/support.html"/>
   <AppDomains>
     <AppDomain>https://lug-spell.github.io/client/</AppDomain>
     <AppDomain>https://lingo-word-server.herokuapp.com</AppDomain>
