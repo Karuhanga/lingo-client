@@ -1,4 +1,4 @@
-import {language as luganda} from "./config";
+import {language as luganda} from "../../config";
 
 
 export const id = 2_1;

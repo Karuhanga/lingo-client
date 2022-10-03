@@ -1,7 +1,8 @@
 ## Lingo Client
+[Project Docs](https://docs.google.com/document/d/1Ackz0l2ix9Cd8XQw5h_hh0SCI3T0raT1b7vVhfERrVU)
 
 ### Prod;
-- [Client Service](https://karuhanga.github.io/lingo-client/taskpane.html)
+- [Client Service](https://lug-spell.github.io/client/taskpane.html)
 
 
 ### Minimum Supported Versions
@@ -38,7 +39,10 @@
 This repository contains the source code used by the [Yo Office generator](https://github.com/OfficeDev/generator-office) when you create a new Office Add-in that appears in the task pane. You can also use this repository as a sample to base your own project from if you choose not to use the generator. 
 
 ### Debugging
-This template supports debugging using any of the following techniques:
+Open a browser dev console to look at logs by:
+- Mac: https://learn.microsoft.com/en-us/office/dev/add-ins/testing/debug-office-add-ins-on-ipad-and-mac
+- 
+
 
 ### Relevant Links
 - [Tutorial](https://docs.microsoft.com/en-us/office/dev/add-ins/tutorials/word-tutorial)

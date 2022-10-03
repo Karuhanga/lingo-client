@@ -1,18 +1,19 @@
 import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react/lib/Button";
 import * as React from "react";
-import {useDocumentManager} from "../hooks/documentManager";
-import {DictionaryManager} from "../hooks/dictionaryManager";
+import {useDocumentManager} from "../data/document/documentManager";
+import {DictionaryManager} from "../data/dictionaryManager";
 
 export interface WrongWordSuggestion {wrong: string, suggestions: string[]}
 
 export interface SingleWrongWordProps {
-    wrongWord: WrongWordSuggestion;
-    removeWord(wrongWord: string): void;
+    word: string;
+    removeWrongWord(wrongWord: string): void;
     dictionaryManager: DictionaryManager;
     setDebug?(message: string): void;
 }
 
-export function SingleWrongWord({wrongWord, removeWord, dictionaryManager, setDebug}: SingleWrongWordProps) {
+export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDebug}: SingleWrongWordProps) {
+    const wrongWord = dictionaryManager.suggestCorrections(word);
     const firstSuggestion = wrongWord.suggestions[0];
     const weHaveSuggestions = !!firstSuggestion;
     const documentManager = useDocumentManager(setDebug);
@@ -40,7 +41,7 @@ export function SingleWrongWord({wrongWord, removeWord, dictionaryManager, setDe
                             items: wrongWord.suggestions.map(suggestion => ({
                                 key: suggestion,
                                 text: suggestion,
-                                onClick: () => {documentManager.replaceWord(wrongWord.wrong, suggestion).then(() => removeWord(wrongWord.wrong))},
+                                onClick: () => {documentManager.replaceWord(wrongWord.wrong, suggestion).then(() => removeWrongWord(wrongWord.wrong))},
                             })),
                         }}
                     />
@@ -51,7 +52,7 @@ export function SingleWrongWord({wrongWord, removeWord, dictionaryManager, setDe
                     <Button
                         buttonType={ButtonType.icon}
                         iconProps={{ iconName: "CheckMark" }}
-                        onClick={() => {documentManager.replaceWord(wrongWord.wrong, firstSuggestion).then(() => removeWord(wrongWord.wrong))}}
+                        onClick={() => {documentManager.replaceWord(wrongWord.wrong, firstSuggestion).then(() => removeWrongWord(wrongWord.wrong))}}
                     />
                 )}
             </td>
@@ -67,16 +68,17 @@ export function SingleWrongWord({wrongWord, removeWord, dictionaryManager, setDe
                                 iconProps: { iconName: 'Add' },
                                 onClick: () => {
                                     dictionaryManager.addWordLocal(wrongWord.wrong);
-                                    removeWord(wrongWord.wrong);
+                                    removeWrongWord(wrongWord.wrong);
                                 },
                             },
                             {
                                 key: 'addToGlobalDictionary',
                                 text: 'Propose Word',
+                                disabled: true,
                                 iconProps: { iconName: 'World' },
                                 onClick: () => {
                                     dictionaryManager.addWordGlobal(wrongWord.wrong);
-                                    removeWord(wrongWord.wrong);
+                                    removeWrongWord(wrongWord.wrong);
                                 },
                             },
                         ],

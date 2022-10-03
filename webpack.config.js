@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require('webpack');
 
 const urlDev="https://localhost:3000";
-const urlProd="https://karuhanga.github.io/lingo-client";
+const urlProd="https://lug-spell.github.io/client/";
 
 module.exports = async (env, options)  => {
   const dev = options.mode === "development";

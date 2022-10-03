@@ -1,11 +1,18 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import FuzzySet from 'fuzzyset'
-import {WrongWordSuggestion} from "../components/SingleWrongWord";
-import {unique} from "../utils/utils";
+import {WrongWordSuggestion} from "../ui/SingleWrongWord";
+import {unique} from "../utils/stringUtils";
 import * as config from "../../config"
-import * as bundledDictionary from "../../bundledDictionary";
-import {useRemoteDictionary} from "../../config";
+import {useRemoteDictionary} from "../../config"
+import * as bundledDictionary from "./bundledDictionary";
+import {
+    APIDictionary,
+    APIWord,
+    Dictionary,
+    OptionalDictionary,
+    PersistedDictionary
+} from "./definitions";
 
 export interface DictionaryManager {
     weHaveADictionary(): boolean;
@@ -13,40 +20,11 @@ export interface DictionaryManager {
     dictionaryUpdating: boolean;
     checkSpellings(toCheck: string[]): Promise<string[]>;
     retryDictionaryDownload();
-    suggestCorrections(word: string, correctionCount: 5): WrongWordSuggestion;
+    suggestCorrections(word: string): WrongWordSuggestion;
     addWordLocal(word: string);
     addWordGlobal(word: string);
     clearLocalDictionary();
 }
-
-interface GlobalSuggestion {
-    word: string;
-    synced: boolean;
-}
-
-interface APIWord {
-    id: number,
-    word: string,
-    language: string,
-}
-
-interface APIDictionary {
-    id: number,
-    words: string[],
-    language: string,
-}
-
-interface PersistedDictionary extends APIDictionary {
-    localWords: string[],
-    globalSuggestions: GlobalSuggestion[],
-}
-
-interface Dictionary extends PersistedDictionary{
-    indexedWords: { [word: string]: boolean },
-    spellChecker: FuzzySet,
-}
-
-type OptionalDictionary = Dictionary | null;
 
 const minSimilarityScore = .7;
 
@@ -120,29 +98,18 @@ export function useDictionaryManager(): DictionaryManager {
         if (ongoingAPICall) return;
         setOngoingAPICall(true);
 
-        if (useRemoteDictionary) {
-            api.fetchDictionary(config.language)
-                .then((apiDictionary: APIDictionary) => {
-                    const persistedDictionary: PersistedDictionary = (
-                        dictionary ?
-                            {...dictionary, ...apiDictionary} :
-                            {localWords: [], globalSuggestions: [], ...apiDictionary}
-                    );
-                    setDictionary(saveDictionary(persistedDictionary));
-                })
-                .finally(() => setOngoingAPICall(false));
-        } else {
-            const apiDictionary: APIDictionary = {
-                id: bundledDictionary.id, language: bundledDictionary.language, words: bundledDictionary.words,
-            };
-            const persistedDictionary: PersistedDictionary = (
-                dictionary ?
-                    {...dictionary, ...apiDictionary} :
-                    {localWords: [], globalSuggestions: [], ...apiDictionary}
-            );
-            setDictionary(saveDictionary(persistedDictionary));
-            setOngoingAPICall(false);
-        }
+        const fetchDictionary = useRemoteDictionary ? api.fetchDictionary : api.fetchBundledDictionary;
+
+        fetchDictionary(config.language)
+            .then((apiDictionary: APIDictionary) => {
+                const persistedDictionary: PersistedDictionary = (
+                    dictionary ?
+                        {...dictionary, ...apiDictionary} :
+                        {localWords: [], globalSuggestions: [], ...apiDictionary}
+                );
+                setDictionary(saveDictionary(persistedDictionary));
+            })
+            .finally(() => setOngoingAPICall(false));
     }
 
     useEffect(() => {
@@ -180,6 +147,10 @@ const axiosInstance = axios.create({
 const api = {
     fetchDictionary(languageName: string): Promise<APIDictionary> {
         return axiosInstance.get(`/languages/${languageName}/dictionaries/versions/latest`).then(result => result.data.data).catch(console.error);
+    },
+    fetchBundledDictionary(languageName: string): Promise<APIDictionary> {
+        if (languageName !== bundledDictionary.language) throw Error(`Requested language(${languageName}) not available.`)
+        return new Promise(() => bundledDictionary);
     },
     suggestWords(languageName: string, words: string[]): Promise<APIWord[]> {
         return axiosInstance.post(`/languages/${languageName}/suggestions`, {words}).then(result => result.data.data).catch(console.error);
