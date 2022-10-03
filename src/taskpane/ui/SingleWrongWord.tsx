@@ -74,6 +74,7 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDe
                             {
                                 key: 'addToGlobalDictionary',
                                 text: 'Propose Word',
+                                disabled: true,
                                 iconProps: { iconName: 'World' },
                                 onClick: () => {
                                     dictionaryManager.addWordGlobal(wrongWord.wrong);
