@@ -10,7 +10,7 @@ interface SpellChecker {
     runSpellCheck(): void;
 }
 
-const spellCheckEverySeconds = 100 * 60 * 60;
+const spellCheckEverySeconds = 5 * 60;  // every 5 minutes
 
 export function useSpellChecker (): SpellChecker {
     /*

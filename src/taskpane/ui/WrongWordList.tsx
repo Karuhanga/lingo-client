@@ -29,6 +29,7 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
                 iconProps={{ iconName: "EditStyle" }}
                 onClick={runCheck}
                 disabled={recheckDisabled}
+                title="Run Spell Check"
                 // style={{backgroundColor: "transparent"}}
             >
                 Check
