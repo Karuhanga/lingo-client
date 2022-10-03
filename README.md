@@ -10,6 +10,8 @@
 - Office for Mac: 2016
 - Word for Web: Since September 2016
 
+![img.png](designNotes/supported-versions.png)
+
 ### To run;
 - (If on mac) run `npm run dev-server`
 - Run `npm start`
