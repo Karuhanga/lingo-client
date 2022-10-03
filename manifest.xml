@@ -8,7 +8,7 @@
   <Description DefaultValue="A template to get started."/>
   <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-64.png"/>
-  <SupportUrl DefaultValue="https://localhost:3000/assets/support.html"/>
+  <SupportUrl DefaultValue="https://localhost:3000/support.html"/>
   <AppDomains>
     <AppDomain>https://localhost:3000</AppDomain>
     <AppDomain>https://lingo-word-server.herokuapp.com</AppDomain>
