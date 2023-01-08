@@ -16,7 +16,7 @@
     <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-64.png"/>
     <SupportUrl DefaultValue="https://localhost:3000/support.html"/>
     <AppDomains>
-        <!--    <AppDomain>https://localhost:3000</AppDomain>-->
+<!--            <AppDomain>https://localhost:3000</AppDomain>-->
         <AppDomain>https://lug-spell.github.io</AppDomain>
         <AppDomain>https://lingo-word-server.herokuapp.com</AppDomain>
     </AppDomains>
