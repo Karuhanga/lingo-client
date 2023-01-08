@@ -51,6 +51,11 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
         }
     }
 
+    React.useEffect(() => {
+        // run spell check on load
+        runSpellCheck();
+    }, [])
+
     return (
         <div className="ms-welcome">
             <Header logo="assets/logo.png" title={title} message="LugSpell" />
