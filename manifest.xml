@@ -87,7 +87,7 @@
             </bt:ShortStrings>
             <bt:LongStrings>
                 <bt:String id="GetStarted.Description"
-                           DefaultValue="LugSpell was installed succesfully. Go to the Review tab and click the 'LugSpell' button to get started."/>
+                           DefaultValue="LugSpell was successfully installed. Go to the Review tab and click the 'LugSpell' button to get started."/>
                 <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Launch LugSpell"/>
             </bt:LongStrings>
         </Resources>
