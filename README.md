@@ -14,7 +14,7 @@
 
 ### To run;
 - (If on mac) run `npm run dev-server`
-- Run `npm start`
+- Run `npm run dev`
 
 ### Helpful links;
 - Access console logs: https://docs.microsoft.com/en-us/office/dev/add-ins/testing/debug-office-add-ins-on-ipad-and-mac
