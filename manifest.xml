@@ -6,8 +6,8 @@
         xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
         xsi:type="TaskPaneApp"
 >
-    <Id>1d00d115-9438-4103-8323-673ab2576b4e</Id>
-    <Version>1.0.1</Version>
+    <Id>08f0d8ba-c92b-4457-b842-98ee617ed985</Id>
+    <Version>1.0.0.1</Version>
     <ProviderName>Makerere University Research and Innovations</ProviderName>
     <DefaultLocale>en-US</DefaultLocale>
     <DisplayName DefaultValue="LugSpell"/>
@@ -39,7 +39,7 @@
                     </GetStarted>
                     <FunctionFile resid="Commands.Url"/>
                     <ExtensionPoint xsi:type="PrimaryCommandSurface">
-                        <OfficeTab id="TabHome">
+                        <OfficeTab id="TabReviewWord">
                             <Group id="CommandsGroup">
                                 <Label resid="CommandsGroup.Label"/>
                                 <Icon>
@@ -87,8 +87,8 @@
             </bt:ShortStrings>
             <bt:LongStrings>
                 <bt:String id="GetStarted.Description"
-                           DefaultValue="Your sample add-in loaded succesfully. Go to the HOME tab and click the 'Show Taskpane' button to get started."/>
-                <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to Show a Taskpane"/>
+                           DefaultValue="LugSpell was installed succesfully. Go to the Review tab and click the 'LugSpell' button to get started."/>
+                <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Launch LugSpell"/>
             </bt:LongStrings>
         </Resources>
     </VersionOverrides>
