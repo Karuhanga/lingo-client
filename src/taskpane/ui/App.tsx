@@ -41,7 +41,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
         } else {
             return (
                 <div className="ms-welcome">
-                    <Header logo="assets/logo.png" title={title} message="Spell Checker" />
+                    <Header logo="assets/logo.png" title={title} message="LugSpell" />
                     {dictionaryManager.dictionaryUpdating ? "." : ""}
                     <section className="ms-welcome__header ms-bgColor-neutralLighter ms-u-fadeIn500" style={{paddingTop: "15px", paddingBottom: "7.5px"}}>
                         <PrimaryButton onClick={dictionaryManager.retryDictionaryDownload}>Retry Dictionary Load</PrimaryButton>
@@ -53,7 +53,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
 
     return (
         <div className="ms-welcome">
-            <Header logo="assets/logo.png" title={title} message="Spell Checker" />
+            <Header logo="assets/logo.png" title={title} message="LugSpell" />
             <LoadingOverlay loading={isSpellChecking}>
                 <WrongWordList
                     message="Possible misspellings"

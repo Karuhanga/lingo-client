@@ -12,7 +12,7 @@ export default class Header extends React.Component<HeaderProps> {
 
     return (
       <section className="ms-welcome__header ms-bgColor-neutralLighter ms-u-fadeIn500" style={{paddingTop: "15px", paddingBottom: "7.5px"}}>
-        <img width="30" height="30" src={logo} alt={title} title={title} />
+        <img width="50" height="50" src={logo} alt={title} title={title} />
         <h2 className="ms-fontWeight-semilight ms-fontColor-neutralPrimary">{message}</h2>
       </section>
     );
