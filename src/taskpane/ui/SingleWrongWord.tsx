@@ -1,7 +1,7 @@
 import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react/lib/Button";
 import * as React from "react";
-import {useDocumentManager} from "../data/document/documentManager";
-import {DictionaryManager} from "../data/dictionaryManager";
+import {useDocumentService} from "../services/document";
+import {DictionaryManager} from "../services/dictionary/dictionaryManager";
 
 export interface WrongWordSuggestion {wrong: string, suggestions: string[]}
 
@@ -16,7 +16,7 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDe
     const wrongWord = dictionaryManager.suggestCorrections(word);
     const firstSuggestion = wrongWord.suggestions[0];
     const weHaveSuggestions = !!firstSuggestion;
-    const documentManager = useDocumentManager(setDebug);
+    const documentManager = useDocumentService(setDebug);
 
     return (
         <tr>

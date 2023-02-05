@@ -13,8 +13,9 @@ import "../../../assets/icon-32.png";
 import "../../../assets/icon-64.png";
 import "../../../assets/icon-80.png";
 import {useSpellChecker} from "./spellChecker";
-import {useDictionaryManager} from "../data/dictionaryManager";
 import {LoadingOverlay} from "./LoadingOverlay";
+import {dictionaryService} from "../services/dictionary";
+import {observer} from "mobx-react-lite";
 
 export interface AppProps {
     title: string;
@@ -22,8 +23,7 @@ export interface AppProps {
 }
 const initialListCount = 20;
 
-export default function App({ title, isOfficeInitialized }: AppProps) {
-    const dictionaryManager = useDictionaryManager();
+const App = observer(({ title, isOfficeInitialized }: AppProps) => {
     const [showNWords, setShowNWords] = useState(initialListCount);
     const {isSpellChecking, removeWrongWord, wrongWords, runSpellCheck} = useSpellChecker();
 
@@ -33,8 +33,8 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
         );
     }
 
-    if (!dictionaryManager.weHaveADictionary()) {
-        if (dictionaryManager.dictionaryUpdating) {
+    if (!dictionaryService.weHaveADictionary) {
+        if (dictionaryService.isDictionaryUpdating) {
             return (
                 <Progress title="Setting up..." logo="assets/logo.png" message="Loading dictionary..." />
             )
@@ -42,9 +42,9 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
             return (
                 <div className="ms-welcome">
                     <Header logo="assets/logo.png" title={title} message="LugSpell" />
-                    {dictionaryManager.dictionaryUpdating ? "." : ""}
+                    {dictionaryService.isDictionaryUpdating ? "." : ""}
                     <section className="ms-welcome__header ms-bgColor-neutralLighter ms-u-fadeIn500" style={{paddingTop: "15px", paddingBottom: "7.5px"}}>
-                        <PrimaryButton onClick={dictionaryManager.retryDictionaryDownload}>Retry Dictionary Load</PrimaryButton>
+                        <PrimaryButton onClick={dictionaryService.retryDictionaryDownload}>Retry Dictionary Load</PrimaryButton>
                     </section>
                 </div>
             )
@@ -72,9 +72,12 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
                         setShowNWords(showNWords + 20);
                     }}
                     showShowMore={showNWords < wrongWords.length}
-                    dictionaryManager={dictionaryManager}
+                    dictionaryService={dictionaryService}
                 />
             </LoadingOverlay>
         </div>
     );
-}
+});
+
+
+export default App;

@@ -1,7 +1,7 @@
-import {useDictionaryManager} from "../data/dictionaryManager";
-import {useDocumentManager} from "../data/document/documentManager";
+import {useDocumentService} from "../services/document";
 import {useState} from "react";
 import useInterval from "@use-it/interval";
+import {dictionaryService} from "../services/dictionary";
 
 interface SpellChecker {
     isSpellChecking: boolean;
@@ -17,8 +17,7 @@ export function useSpellChecker (): SpellChecker {
     * Should be a singleton
     * */
 
-    const dictionaryManager = useDictionaryManager();
-    const documentManager = useDocumentManager();
+    const documentManager = useDocumentService();
 
     const [isSpellChecking, setIsSpellChecking] = useState(false);
     const [wrongWords, setWrongWords] = useState<string[]>([]);
@@ -45,12 +44,12 @@ export function useSpellChecker (): SpellChecker {
     }
 
     function runSpellCheck() {
-        if (dictionaryManager.weHaveADictionary() && !isSpellChecking) {
+        if (dictionaryService.weHaveADictionary && !isSpellChecking) {
             setIsSpellChecking(true);
 
             documentManager.getWords()
             .then(timeGetWords)
-            .then(words => dictionaryManager.checkSpellings(words))
+            .then(words => dictionaryService.checkSpellings(words))
             .then(timeCheckSpellings)
             .then(setWrongWords)
             .then(timeSetWords)
