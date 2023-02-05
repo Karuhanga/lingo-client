@@ -1,6 +1,6 @@
-import {getDocumentWords, replaceWord, jumpToWord, getSectionCount} from "./"
+import {getDocumentWords, replaceWord, jumpToWord, getSectionCount} from "./helpers"
 
-interface DocumentManager {
+interface DocumentService {
     getWords(): Promise<string[]>;
     replaceWord(word: string, replacement: string): Promise<void>;
     jumpToWord(word: string);
@@ -9,7 +9,7 @@ interface DocumentManager {
 
 export const sectionNotFoundMessage = "Section not found";
 
-export function useDocumentManager(setDebug?): DocumentManager {
+export function useDocumentManager(setDebug?): DocumentService {
     if (setDebug) setDebug("using document manager");
 
     return {
