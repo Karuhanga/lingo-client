@@ -50,7 +50,7 @@ const WrongWordList = ({ items, message, runCheck, recheckDisabled, removeWrongW
             <table className="ms-font-m ms-fontColor-neutralPrimary">
                 <tbody>
                 {items.map((wrongWord) =>
-                    <SingleWrongWord key={wrongWord} word={wrongWord} removeWrongWord={removeWrongWord} dictionaryManager={dictionaryService} setDebug={setDebug} />
+                    <SingleWrongWord key={wrongWord} word={wrongWord} removeWrongWord={removeWrongWord} dictionaryService={dictionaryService} setDebug={setDebug} />
                 )}
                 </tbody>
             </table>

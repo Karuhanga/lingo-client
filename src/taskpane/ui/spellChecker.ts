@@ -17,7 +17,7 @@ export function useSpellChecker (): SpellChecker {
     * Should be a singleton
     * */
 
-    const documentManager = useDocumentService();
+    const documentService = useDocumentService();
 
     const [isSpellChecking, setIsSpellChecking] = useState(false);
     const [wrongWords, setWrongWords] = useState<string[]>([]);
@@ -47,7 +47,7 @@ export function useSpellChecker (): SpellChecker {
         if (dictionaryService.weHaveADictionary && !isSpellChecking) {
             setIsSpellChecking(true);
 
-            documentManager.getWords()
+            documentService.getWords()
             .then(timeGetWords)
             .then(words => dictionaryService.checkSpellings(words))
             .then(timeCheckSpellings)

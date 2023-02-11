@@ -10,7 +10,7 @@ interface DocumentService {
 export const sectionNotFoundMessage = "Section not found";
 
 export function useDocumentService(setDebug?): DocumentService {
-    if (setDebug) setDebug("using document manager");
+    if (setDebug) setDebug("using document service");
 
     return {
         getWords: getDocumentWords,

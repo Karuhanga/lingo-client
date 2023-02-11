@@ -1,22 +1,22 @@
 import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react/lib/Button";
 import * as React from "react";
 import {useDocumentService} from "../services/document";
-import {DictionaryManager} from "../services/dictionary/dictionaryManager";
+import {DictionaryService} from "../services/dictionary";
 
 export interface WrongWordSuggestion {wrong: string, suggestions: string[]}
 
 export interface SingleWrongWordProps {
     word: string;
     removeWrongWord(wrongWord: string): void;
-    dictionaryManager: DictionaryManager;
+    dictionaryService: DictionaryService;
     setDebug?(message: string): void;
 }
 
-export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDebug}: SingleWrongWordProps) {
-    const wrongWord = dictionaryManager.suggestCorrections(word);
+export function SingleWrongWord({word, removeWrongWord, dictionaryService, setDebug}: SingleWrongWordProps) {
+    const wrongWord = dictionaryService.suggestCorrections(word);
     const firstSuggestion = wrongWord.suggestions[0];
     const weHaveSuggestions = !!firstSuggestion;
-    const documentManager = useDocumentService(setDebug);
+    const documentService = useDocumentService(setDebug);
 
     return (
         <tr>
@@ -26,7 +26,7 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDe
                     style={{width: "100%", border: "0", overflow: "hidden", textOverflow: "ellipsis"}}
                     menuIconProps={{iconName: "__nonExistent__"}}
                     text={wrongWord.wrong}
-                    onClick={() => documentManager.jumpToWord(wrongWord.wrong)}
+                    onClick={() => documentService.jumpToWord(wrongWord.wrong)}
                 />
             </td>
             <td style={{verticalAlign: "middle"}}>&nbsp;{weHaveSuggestions ? " → " : ""}&nbsp;</td>
@@ -41,7 +41,7 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDe
                             items: wrongWord.suggestions.map(suggestion => ({
                                 key: suggestion,
                                 text: suggestion,
-                                onClick: () => {documentManager.replaceWord(wrongWord.wrong, suggestion).then(() => removeWrongWord(wrongWord.wrong))},
+                                onClick: () => {documentService.replaceWord(wrongWord.wrong, suggestion).then(() => removeWrongWord(wrongWord.wrong))},
                             })),
                         }}
                     />
@@ -52,7 +52,7 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDe
                     <Button
                         buttonType={ButtonType.icon}
                         iconProps={{ iconName: "CheckMark" }}
-                        onClick={() => {documentManager.replaceWord(wrongWord.wrong, firstSuggestion).then(() => removeWrongWord(wrongWord.wrong))}}
+                        onClick={() => {documentService.replaceWord(wrongWord.wrong, firstSuggestion).then(() => removeWrongWord(wrongWord.wrong))}}
                     />
                 )}
             </td>
@@ -67,7 +67,7 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDe
                                 text: 'Add to my dictionary',
                                 iconProps: { iconName: 'Add' },
                                 onClick: () => {
-                                    dictionaryManager.addWordLocal(wrongWord.wrong);
+                                    dictionaryService.addWordLocal(wrongWord.wrong);
                                     removeWrongWord(wrongWord.wrong);
                                 },
                             },
@@ -77,7 +77,7 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDe
                                 disabled: true,
                                 iconProps: { iconName: 'World' },
                                 onClick: () => {
-                                    dictionaryManager.addWordGlobal(wrongWord.wrong);
+                                    dictionaryService.addWordGlobal(wrongWord.wrong);
                                     removeWrongWord(wrongWord.wrong);
                                 },
                             },

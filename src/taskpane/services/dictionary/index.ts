@@ -13,40 +13,47 @@ export class DictionaryService {
     minSimilarityScore = .7
 
     constructor() {
+        const self = this;
         makeObservable(this, {
             dictionary: observable,
             isDictionaryUpdating: observable,
             weHaveADictionary: computed,
         });
-        this.init();
+        self.init();
     }
 
     init() {
+        const self = this;
         autorun(() => {
-            this.updateDictionary().then(() => {
-                this.suggestGlobalWords();
+            self.updateDictionary().then(() => {
+                self.suggestGlobalWords();
             })
         });
     }
 
     get weHaveADictionary(): boolean {
-        return !!this.dictionary;
+        const self = this;
+        return !!self.dictionary;
     }
 
     setDictionaryIsUpdating(isUpdating: boolean) {
-        this.isDictionaryUpdating = isUpdating;
+        const self = this;
+        self.isDictionaryUpdating = isUpdating;
     }
 
     setDictionary(dictionary: OptionalDictionary) {
-        this.dictionary = dictionary;
+        const self = this;
+        self.dictionary = dictionary;
     }
 
     checkSpellings(toCheck: string[]): string[] {
-        return toCheck.filter(word => !this.dictionary.indexedWords[word]);
+        const self = this;
+        return toCheck.filter(word => !self.dictionary.indexedWords[word]);
     }
 
     suggestCorrections(word: string): WrongWordSuggestion {
-        const result: [number, string] = this.dictionary.spellChecker.get(word, [], this.minSimilarityScore);
+        const self = this;
+        const result: [number, string] = self.dictionary.spellChecker.get(word, [], self.minSimilarityScore);
         return {
             wrong: word,
             suggestions: result.map(result => result[1]),
@@ -54,88 +61,96 @@ export class DictionaryService {
     }
 
     addWordLocal(word: string) {
+        const self = this;
         const persistedDictionary: PersistedDictionary = {
-            id: this.dictionary.id,
-            words: this.dictionary.words,
-            language: this.dictionary.language,
-            localWords: unique([...this.dictionary.localWords, word]),
-            globalSuggestions: this.dictionary.globalSuggestions,
+            id: self.dictionary.id,
+            words: self.dictionary.words,
+            language: self.dictionary.language,
+            localWords: unique([...self.dictionary.localWords, word]),
+            globalSuggestions: self.dictionary.globalSuggestions,
         };
 
-        this.setDictionary(saveDictionary(persistedDictionary));
+        self.setDictionary(saveDictionary(persistedDictionary));
     }
 
     addWordGlobal(word: string) {
+        const self = this;
         const persistedDictionary: PersistedDictionary = {
-            id: this.dictionary.id,
-            words: this.dictionary.words,
-            language: this.dictionary.language,
-            localWords: this.dictionary.localWords,
-            globalSuggestions: [...this.dictionary.globalSuggestions, {word, synced: false}],
+            id: self.dictionary.id,
+            words: self.dictionary.words,
+            language: self.dictionary.language,
+            localWords: self.dictionary.localWords,
+            globalSuggestions: [...self.dictionary.globalSuggestions, {word, synced: false}],
         };
 
-        this.setDictionary(saveDictionary(persistedDictionary));
+        self.setDictionary(saveDictionary(persistedDictionary));
     }
 
     trackSyncedSuggestions(words: string[]) {
+        const self = this;
         const persistedDictionary: PersistedDictionary = {
-            id: this.dictionary.id,
-            words: this.dictionary.words,
-            language: this.dictionary.language,
-            localWords: this.dictionary.localWords,
-            globalSuggestions: this.dictionary.globalSuggestions.map(({word, synced}) => ({word, synced: synced || words.includes(word)})),
+            id: self.dictionary.id,
+            words: self.dictionary.words,
+            language: self.dictionary.language,
+            localWords: self.dictionary.localWords,
+            globalSuggestions: self.dictionary.globalSuggestions.map(({word, synced}) => ({word, synced: synced || words.includes(word)})),
         };
 
-        this.setDictionary(saveDictionary(persistedDictionary));
+        self.setDictionary(saveDictionary(persistedDictionary));
     }
 
     clearLocalDictionary() {
+        const self = this;
         const persistedDictionary: PersistedDictionary = {
-            id: this.dictionary.id,
-            words: this.dictionary.words,
-            language: this.dictionary.language,
+            id: self.dictionary.id,
+            words: self.dictionary.words,
+            language: self.dictionary.language,
             localWords: [],
-            globalSuggestions: this.dictionary.globalSuggestions,
+            globalSuggestions: self.dictionary.globalSuggestions,
         };
 
-        this.setDictionary(saveDictionary(persistedDictionary));
+        self.setDictionary(saveDictionary(persistedDictionary));
     }
 
     fetchDictionary() {
-        if (this.isDictionaryUpdating) return;
-        this.setDictionaryIsUpdating(true);
+        const self = this;
+        if (self.isDictionaryUpdating) return;
+        self.setDictionaryIsUpdating(true);
 
         const fetchDictionary = useRemoteDictionary ? api.fetchDictionary : api.fetchBundledDictionary;
 
         fetchDictionary(config.language)
             .then((apiDictionary: APIDictionary) => {
                 const persistedDictionary: PersistedDictionary = (
-                    this.dictionary ?
-                        {...this.dictionary, ...apiDictionary} :
+                    self.dictionary ?
+                        {...self.dictionary, ...apiDictionary} :
                         {localWords: [], globalSuggestions: [], ...apiDictionary}
                 );
-                this.setDictionary(saveDictionary(persistedDictionary));
+                self.setDictionary(saveDictionary(persistedDictionary));
             })
-            .finally(() => this.setDictionaryIsUpdating(false));
+            .finally(() => self.setDictionaryIsUpdating(false));
     }
 
     updateDictionary() {
-        this.setDictionaryIsUpdating(true);
-        return api.checkWeHaveTheLatestVersion(this.dictionary)
+        const self = this;
+        self.setDictionaryIsUpdating(true);
+        return api.checkWeHaveTheLatestVersion(self.dictionary)
             .then(weDo => {
-                if (!weDo) this.fetchDictionary();
+                if (!weDo) self.fetchDictionary();
             })
-            .finally(() => this.setDictionaryIsUpdating(false));
+            .finally(() => self.setDictionaryIsUpdating(false));
     }
 
     suggestGlobalWords() {
-        if (!this.weHaveADictionary) return;
-        api.suggestWords(config.language, this.dictionary.globalSuggestions.filter(suggestion => !suggestion.synced).map(suggestion => suggestion.word))
-            .then((words: APIWord[]) => this.trackSyncedSuggestions(words.map(word => word.word)));
+        const self = this;
+        if (!self.weHaveADictionary) return;
+        api.suggestWords(config.language, self.dictionary.globalSuggestions.filter(suggestion => !suggestion.synced).map(suggestion => suggestion.word))
+            .then((words: APIWord[]) => self.trackSyncedSuggestions(words.map(word => word.word)));
     }
 
     retryDictionaryDownload() {
-        this.fetchDictionary();
+        const self = this;
+        self.fetchDictionary();
     }
 }
 
