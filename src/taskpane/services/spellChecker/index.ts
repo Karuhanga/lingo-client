@@ -7,7 +7,7 @@ import {useDictionaryService} from "../dictionary";
 export class SpellChecker {
     documentService = useDocumentService();
     dictionaryService = useDictionaryService();
-    spellCheckEverySeconds = 5 * 60;  // every 5 minutes
+    spellCheckEverySeconds = 2 * 60;  // every 2 minutes
     isSpellChecking: boolean = false;
     wrongWords: string[] = [];
 
