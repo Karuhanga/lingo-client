@@ -14,7 +14,7 @@ export const api = {
     },
     fetchBundledDictionary(languageName: string): Promise<APIDictionary> {
         if (languageName !== bundledDictionary.language) throw Error(`Requested language(${languageName}) not available.`)
-        return new Promise(() => bundledDictionary);
+        return Promise.resolve(bundledDictionary);
     },
     suggestWords(languageName: string, words: string[]): Promise<APIWord[]> {
         if (!useRemoteDictionary) return new Promise(() => []);
