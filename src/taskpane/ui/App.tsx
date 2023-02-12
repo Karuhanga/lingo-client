@@ -34,7 +34,7 @@ const App = observer(({ title, isOfficeInitialized }: AppProps) => {
         );
     }
 
-    if (!dictionaryService.weHaveADictionary) {
+    if (!dictionaryService.isDictionaryAvailable) {
         if (dictionaryService.isDictionaryUpdating) {
             return (
                 <Progress title="Setting up..." logo="assets/logo.png" message="Loading dictionary..." />

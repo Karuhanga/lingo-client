@@ -2,6 +2,7 @@ import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react/lib/Butt
 import * as React from "react";
 import {useDocumentService} from "../services/document";
 import {DictionaryService} from "../services/dictionary";
+import {onTimeWindow} from "../utils/asyncUtils";
 
 export interface WrongWordSuggestion {wrong: string, suggestions: string[]}
 
@@ -17,6 +18,7 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryService, setDe
     const firstSuggestion = wrongWord.suggestions[0];
     const weHaveSuggestions = !!firstSuggestion;
     const documentService = useDocumentService(setDebug);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     return (
         <tr>
@@ -26,7 +28,11 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryService, setDe
                     style={{width: "100%", border: "0", overflow: "hidden", textOverflow: "ellipsis"}}
                     menuIconProps={{iconName: "__nonExistent__"}}
                     text={wrongWord.wrong}
-                    onClick={() => documentService.jumpToWord(wrongWord.wrong)}
+                    onClick={() => {
+                        setIsLoading(true);
+                        documentService.jumpToWord(wrongWord.wrong);
+                        setIsLoading(false);
+                    }}
                 />
             </td>
             <td style={{verticalAlign: "middle"}}>&nbsp;{weHaveSuggestions ? " → " : ""}&nbsp;</td>
@@ -41,18 +47,30 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryService, setDe
                             items: wrongWord.suggestions.map(suggestion => ({
                                 key: suggestion,
                                 text: suggestion,
-                                onClick: () => {documentService.replaceWord(wrongWord.wrong, suggestion).then(() => removeWrongWord(wrongWord.wrong))},
+                                onClick: () => {
+                                    setIsLoading(true);
+                                    documentService.replaceWord(wrongWord.wrong, suggestion).then(() => removeWrongWord(wrongWord.wrong)).finally(() => setIsLoading(false));
+                                },
                             })),
                         }}
                     />
                 )}
             </td>
             <td>
-                {!weHaveSuggestions ? null : (
+                {!isLoading ? null : (
+                    <Button
+                        buttonType={ButtonType.icon}
+                        iconProps={{iconName: "ProgressRingDots"}}
+                        />
+                )}
+                {isLoading || !weHaveSuggestions ? null : (
                     <Button
                         buttonType={ButtonType.icon}
                         iconProps={{ iconName: "CheckMark" }}
-                        onClick={() => {documentService.replaceWord(wrongWord.wrong, firstSuggestion).then(() => removeWrongWord(wrongWord.wrong))}}
+                        onClick={() => {
+                            setIsLoading(true);
+                            documentService.replaceWord(wrongWord.wrong, firstSuggestion).then(() => removeWrongWord(wrongWord.wrong)).finally(() => setIsLoading(false));
+                        }}
                     />
                 )}
             </td>
@@ -67,8 +85,11 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryService, setDe
                                 text: 'Add to my dictionary',
                                 iconProps: { iconName: 'Add' },
                                 onClick: () => {
-                                    dictionaryService.addWordLocal(wrongWord.wrong);
-                                    removeWrongWord(wrongWord.wrong);
+                                    setIsLoading(true);
+                                    onTimeWindow(() => {
+                                        dictionaryService.addWordLocal(wrongWord.wrong);
+                                        removeWrongWord(wrongWord.wrong);
+                                    }).finally(() => setIsLoading(false));
                                 },
                             },
                             {
@@ -77,9 +98,12 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryService, setDe
                                 disabled: true,
                                 iconProps: { iconName: 'World' },
                                 onClick: () => {
-                                    dictionaryService.addWordGlobal(wrongWord.wrong);
-                                    removeWrongWord(wrongWord.wrong);
-                                },
+                                    setIsLoading(true);
+                                    onTimeWindow(() => {
+                                        dictionaryService.addWordGlobal(wrongWord.wrong);
+                                        removeWrongWord(wrongWord.wrong);
+                                    }).finally(() => setIsLoading(false));
+                                }
                             },
                         ],
                     }}

@@ -5,24 +5,20 @@ import {api} from "./api";
 import {saveDictionary} from "./helpers";
 import {WrongWordSuggestion} from "../../ui/SingleWrongWord";
 import {unique} from "../../utils/stringUtils";
-import {autorun, computed, action, makeObservable, observable} from "mobx";
+import {autorun, action, makeObservable, observable} from "mobx";
 
 export class DictionaryService {
-    dictionary: OptionalDictionary = undefined;
+    dictionary: OptionalDictionary = undefined;  // not observable because it's quite big and we don't need to re-render on change
+    isDictionaryAvailable: boolean = false;
     isDictionaryUpdating: boolean = false;
     minSimilarityScore = .7
 
     constructor() {
         makeObservable(this, {
-            dictionary: observable,
             isDictionaryUpdating: observable,
-            weHaveADictionary: computed,
+            isDictionaryAvailable: observable,
             setDictionaryIsUpdating: action,
         });
-    }
-
-    get weHaveADictionary(): boolean {
-        return !!self.dictionary;
     }
 
     setDictionaryIsUpdating(isUpdating: boolean) {
@@ -31,6 +27,7 @@ export class DictionaryService {
 
     setDictionary(dictionary: OptionalDictionary) {
         self.dictionary = dictionary;
+        self.isDictionaryAvailable = true;
     }
 
     checkSpellings(toCheck: string[]): string[] {
@@ -54,7 +51,9 @@ export class DictionaryService {
             globalSuggestions: self.dictionary.globalSuggestions,
         };
 
+        console.time("saveDictionary");
         self.setDictionary(saveDictionary(persistedDictionary));
+        console.timeEnd("saveDictionary");
     }
 
     addWordGlobal(word: string) {
@@ -119,7 +118,7 @@ export class DictionaryService {
     }
 
     suggestGlobalWords() {
-        if (!self.weHaveADictionary) return;
+        if (!self.isDictionaryAvailable) return;
         api.suggestWords(config.language, self.dictionary.globalSuggestions.filter(suggestion => !suggestion.synced).map(suggestion => suggestion.word))
             .then((words: APIWord[]) => self.trackSyncedSuggestions(words.map(word => word.word)));
     }

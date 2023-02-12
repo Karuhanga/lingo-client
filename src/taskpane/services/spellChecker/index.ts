@@ -35,7 +35,7 @@ export class SpellChecker {
     }
 
     runSpellCheck() {
-        if (self.dictionaryService.weHaveADictionary && !self.isSpellChecking) {
+        if (self.dictionaryService.isDictionaryAvailable && !self.isSpellChecking) {
             self.setIsSpellChecking(true);
 
             self.documentService.getWords()
