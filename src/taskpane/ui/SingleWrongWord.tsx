@@ -1,22 +1,24 @@
 import {Button, ButtonType, DefaultButton} from "office-ui-fabric-react/lib/Button";
 import * as React from "react";
-import {useDocumentManager} from "../data/document/documentManager";
-import {DictionaryManager} from "../data/dictionaryManager";
+import {useDocumentService} from "../services/document";
+import {DictionaryService} from "../services/dictionary";
+import {onTimeWindow} from "../utils/asyncUtils";
 
 export interface WrongWordSuggestion {wrong: string, suggestions: string[]}
 
 export interface SingleWrongWordProps {
     word: string;
     removeWrongWord(wrongWord: string): void;
-    dictionaryManager: DictionaryManager;
+    dictionaryService: DictionaryService;
     setDebug?(message: string): void;
 }
 
-export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDebug}: SingleWrongWordProps) {
-    const wrongWord = dictionaryManager.suggestCorrections(word);
+export function SingleWrongWord({word, removeWrongWord, dictionaryService, setDebug}: SingleWrongWordProps) {
+    const wrongWord = dictionaryService.suggestCorrections(word);
     const firstSuggestion = wrongWord.suggestions[0];
     const weHaveSuggestions = !!firstSuggestion;
-    const documentManager = useDocumentManager(setDebug);
+    const documentService = useDocumentService(setDebug);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     return (
         <tr>
@@ -26,7 +28,11 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDe
                     style={{width: "100%", border: "0", overflow: "hidden", textOverflow: "ellipsis"}}
                     menuIconProps={{iconName: "__nonExistent__"}}
                     text={wrongWord.wrong}
-                    onClick={() => documentManager.jumpToWord(wrongWord.wrong)}
+                    onClick={() => {
+                        setIsLoading(true);
+                        documentService.jumpToWord(wrongWord.wrong);
+                        setIsLoading(false);
+                    }}
                 />
             </td>
             <td style={{verticalAlign: "middle"}}>&nbsp;{weHaveSuggestions ? " → " : ""}&nbsp;</td>
@@ -41,18 +47,30 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDe
                             items: wrongWord.suggestions.map(suggestion => ({
                                 key: suggestion,
                                 text: suggestion,
-                                onClick: () => {documentManager.replaceWord(wrongWord.wrong, suggestion).then(() => removeWrongWord(wrongWord.wrong))},
+                                onClick: () => {
+                                    setIsLoading(true);
+                                    documentService.replaceWord(wrongWord.wrong, suggestion).then(() => removeWrongWord(wrongWord.wrong)).finally(() => setIsLoading(false));
+                                },
                             })),
                         }}
                     />
                 )}
             </td>
             <td>
-                {!weHaveSuggestions ? null : (
+                {!isLoading ? null : (
+                    <Button
+                        buttonType={ButtonType.icon}
+                        iconProps={{iconName: "ProgressRingDots"}}
+                        />
+                )}
+                {isLoading || !weHaveSuggestions ? null : (
                     <Button
                         buttonType={ButtonType.icon}
                         iconProps={{ iconName: "CheckMark" }}
-                        onClick={() => {documentManager.replaceWord(wrongWord.wrong, firstSuggestion).then(() => removeWrongWord(wrongWord.wrong))}}
+                        onClick={() => {
+                            setIsLoading(true);
+                            documentService.replaceWord(wrongWord.wrong, firstSuggestion).then(() => removeWrongWord(wrongWord.wrong)).finally(() => setIsLoading(false));
+                        }}
                     />
                 )}
             </td>
@@ -67,8 +85,11 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDe
                                 text: 'Add to my dictionary',
                                 iconProps: { iconName: 'Add' },
                                 onClick: () => {
-                                    dictionaryManager.addWordLocal(wrongWord.wrong);
-                                    removeWrongWord(wrongWord.wrong);
+                                    setIsLoading(true);
+                                    onTimeWindow(() => {
+                                        dictionaryService.addWordLocal(wrongWord.wrong);
+                                        removeWrongWord(wrongWord.wrong);
+                                    }).finally(() => setIsLoading(false));
                                 },
                             },
                             {
@@ -77,9 +98,12 @@ export function SingleWrongWord({word, removeWrongWord, dictionaryManager, setDe
                                 disabled: true,
                                 iconProps: { iconName: 'World' },
                                 onClick: () => {
-                                    dictionaryManager.addWordGlobal(wrongWord.wrong);
-                                    removeWrongWord(wrongWord.wrong);
-                                },
+                                    setIsLoading(true);
+                                    onTimeWindow(() => {
+                                        dictionaryService.addWordGlobal(wrongWord.wrong);
+                                        removeWrongWord(wrongWord.wrong);
+                                    }).finally(() => setIsLoading(false));
+                                }
                             },
                         ],
                     }}

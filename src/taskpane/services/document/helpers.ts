@@ -1,5 +1,5 @@
 import {removeSpaces, unique} from "../../utils/stringUtils";
-import {sectionNotFoundMessage} from "./documentManager";
+import {sectionNotFoundMessage} from "./index";
 
 function cleanText(text) {
     for (const character of [',', '.', '!', '?']) text = text.replace(character, '');

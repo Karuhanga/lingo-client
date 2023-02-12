@@ -12,9 +12,10 @@ import "../../../assets/icon-16.png";
 import "../../../assets/icon-32.png";
 import "../../../assets/icon-64.png";
 import "../../../assets/icon-80.png";
-import {useSpellChecker} from "./spellChecker";
-import {useDictionaryManager} from "../data/dictionaryManager";
+import {useSpellCheckerService} from "../services/spellChecker";
 import {LoadingOverlay} from "./LoadingOverlay";
+import {observer} from "mobx-react-lite";
+import {useDictionaryService} from "../services/dictionary";
 
 export interface AppProps {
     title: string;
@@ -22,10 +23,10 @@ export interface AppProps {
 }
 const initialListCount = 20;
 
-export default function App({ title, isOfficeInitialized }: AppProps) {
-    const dictionaryManager = useDictionaryManager();
+const App = observer(({ title, isOfficeInitialized }: AppProps) => {
+    const dictionaryService = useDictionaryService();
+    const spellChecker = useSpellCheckerService();
     const [showNWords, setShowNWords] = useState(initialListCount);
-    const {isSpellChecking, removeWrongWord, wrongWords, runSpellCheck} = useSpellChecker();
 
     if (!isOfficeInitialized) {
         return (
@@ -33,8 +34,8 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
         );
     }
 
-    if (!dictionaryManager.weHaveADictionary()) {
-        if (dictionaryManager.dictionaryUpdating) {
+    if (!dictionaryService.isDictionaryAvailable) {
+        if (dictionaryService.isDictionaryUpdating) {
             return (
                 <Progress title="Setting up..." logo="assets/logo.png" message="Loading dictionary..." />
             )
@@ -42,9 +43,9 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
             return (
                 <div className="ms-welcome">
                     <Header logo="assets/logo.png" title={title} message="LugSpell" />
-                    {dictionaryManager.dictionaryUpdating ? "." : ""}
+                    {dictionaryService.isDictionaryUpdating ? "." : ""}
                     <section className="ms-welcome__header ms-bgColor-neutralLighter ms-u-fadeIn500" style={{paddingTop: "15px", paddingBottom: "7.5px"}}>
-                        <PrimaryButton onClick={dictionaryManager.retryDictionaryDownload}>Retry Dictionary Load</PrimaryButton>
+                        <PrimaryButton onClick={dictionaryService.retryDictionaryDownload}>Retry Dictionary Load</PrimaryButton>
                     </section>
                 </div>
             )
@@ -53,28 +54,31 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
 
     React.useEffect(() => {
         // run spell check on load
-        runSpellCheck();
+        spellChecker.runSpellCheck();
     }, [])
 
     return (
         <div className="ms-welcome">
             <Header logo="assets/logo.png" title={title} message="LugSpell" />
-            <LoadingOverlay loading={isSpellChecking}>
+            <LoadingOverlay loading={spellChecker.isSpellChecking}>
                 <WrongWordList
                     message="Possible misspellings"
-                    recheckDisabled={isSpellChecking}
+                    recheckDisabled={spellChecker.isSpellChecking}
                     runCheck={() => {
-                        runSpellCheck();
+                        spellChecker.runSpellCheck();
                     }}
-                    items={wrongWords.slice(0, showNWords)}
-                    removeWrongWord={removeWrongWord}
+                    items={spellChecker.wrongWords.slice(0, showNWords)}
+                    removeWrongWord={spellChecker.removeWrongWord}
                     loadMore={() => {
                         setShowNWords(showNWords + 20);
                     }}
-                    showShowMore={showNWords < wrongWords.length}
-                    dictionaryManager={dictionaryManager}
+                    showShowMore={showNWords < spellChecker.wrongWords.length}
+                    dictionaryService={dictionaryService}
                 />
             </LoadingOverlay>
         </div>
     );
-}
+});
+
+
+export default App;
